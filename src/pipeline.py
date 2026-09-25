@@ -11,12 +11,14 @@ from src.data import CorruptParquetError, load_signals, load_transactions
 from src.ensemble import choose, rank_average
 from src.features import FEATURE_FAMILIES, build_features, prepare_transactions
 from src.models import bagged_predict, make_factory
-from src.selection import eliminate_columns, save_selection, select_families
+from src.selection import eliminate_columns, load_selection, save_selection, select_families
 from src.submission import write
 from src.tuning import tune
 from src.validation import evaluate, log_run
 
 MODELS = ("lightgbm", "xgboost", "catboost", "logreg")
+
+SUMMARY_PATH = config.EXPERIMENTS / "summary.json"
 
 
 def _family_frames(tx: pd.DataFrame, signals: pd.DataFrame) -> dict[str, pd.DataFrame]:
@@ -68,11 +70,29 @@ def run(tune_trials: int = 40, skip_test: bool = False) -> dict:
         "tuned_params": tuned,
     }
     config.EXPERIMENTS.mkdir(parents=True, exist_ok=True)
-    (config.EXPERIMENTS / "summary.json").write_text(json.dumps(summary, indent=2, default=float))
+    SUMMARY_PATH.write_text(json.dumps(summary, indent=2, default=float))
 
     if skip_test:
         print("skip_test=True — stopping before prediction.")
         return summary
+
+    drift = _predict_and_write(families, columns, weights, tuned)
+    summary.update(drift)
+    SUMMARY_PATH.write_text(json.dumps(summary, indent=2, default=float))
+    return summary
+
+
+def _predict_and_write(
+    families: list[str],
+    columns: list[str],
+    weights: dict[str, float],
+    tuned: dict[str, dict],
+) -> dict:
+    """Build test features, report drift, and write the validated submission."""
+    train_signals = load_signals(config.TRAIN_SIGNALS)
+    y = train_signals[config.TARGET]
+    train_tx = prepare_transactions(load_transactions(config.TRAIN_TX), train_signals)
+    X = build_features(train_tx, train_signals, families=families)[columns]
 
     try:
         test_signals = load_signals(config.TEST_SIGNALS)
@@ -86,8 +106,6 @@ def run(tune_trials: int = 40, skip_test: bool = False) -> dict:
     auc, drifting = drift_report(X, X_test)
     print(f"Adversarial validation AUC: {auc:.4f}")
     print("Top drifting columns:\n", drifting.head(10))
-    summary["adversarial_auc"] = auc
-    summary["top_drifting"] = drifting.head(10).to_dict()
 
     predictions = {
         name: bagged_predict(name, tuned[name], X, y, X_test) for name in MODELS
@@ -99,8 +117,23 @@ def run(tune_trials: int = 40, skip_test: bool = False) -> dict:
     path = write(frame, expected)
     print(f"Wrote {path}")
 
-    (config.EXPERIMENTS / "summary.json").write_text(json.dumps(summary, indent=2, default=float))
-    return summary
+    return {"adversarial_auc": auc, "top_drifting": drifting.head(10).to_dict()}
+
+
+def predict_from_saved():
+    """Reproduce the submission from a recorded run, without re-searching."""
+    if not SUMMARY_PATH.exists():
+        raise FileNotFoundError(
+            f"{SUMMARY_PATH} not found. Run `python -m src.pipeline` first; "
+            f"it records the chosen families, the frozen columns, and the tuned params."
+        )
+    summary = json.loads(SUMMARY_PATH.read_text())
+    return _predict_and_write(
+        summary["families"],
+        load_selection()["columns"],
+        summary["weights"],
+        summary["tuned_params"],
+    )
 
 
 if __name__ == "__main__":
