@@ -111,6 +111,15 @@ def build(output_dir: Path | None = None) -> Path:
             r["family"] for r in summary.get("selection_history", [])
             if r["score"] <= 0.5
         }),
+        adversarial=(
+            f"{summary['adversarial_auc']:.4f}"
+            if summary.get("adversarial_auc") is not None else "not yet measured"
+        ),
+        drift_verdict=(
+            "indistinguishable"
+            if (summary.get("adversarial_auc") or 1.0) < 0.55
+            else "separable — treat the estimate with caution"
+        ),
         rejected_families=len({
             r["family"] for r in summary.get("selection_history", [])
         }) - len(summary.get("families", [])),
@@ -200,6 +209,14 @@ within each repeat, then averaged &mdash; rather than by scoring the average of 
 repeats, which inflates ROC-AUC on its own by roughly 0.004 here. Measured honestly,
 the four-model rank average buys <b>{gain}</b> over the best single model
 ({best_single}, {best_single_auc}).</p>
+
+<h2>Do the training and scoring alerts look alike?</h2>
+<p>We trained a classifier to tell training alerts apart from scoring alerts using
+the same features the model uses. It reached ROC-AUC <b>{adversarial}</b> &mdash; the two
+sets are <b>{drift_verdict}</b>. A number near 0.5 means the model is being asked to
+score alerts drawn from the population it learned on, so the cross-validated figure
+above is a meaningful guide to how it will behave on unseen alerts rather than a
+number about a different population.</p>
 
 <h2>What this estimate does and does not say</h2>
 <p>Feature selection and hyperparameter tuning were both carried out on these same

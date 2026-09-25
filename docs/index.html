@@ -75,6 +75,14 @@ repeats, which inflates ROC-AUC on its own by roughly 0.004 here. Measured hones
 the four-model rank average buys <b>+0.0039</b> over the best single model
 (xgboost, 0.6325).</p>
 
+<h2>Do the training and scoring alerts look alike?</h2>
+<p>We trained a classifier to tell training alerts apart from scoring alerts using
+the same features the model uses. It reached ROC-AUC <b>0.4921</b> &mdash; the two
+sets are <b>indistinguishable</b>. A number near 0.5 means the model is being asked to
+score alerts drawn from the population it learned on, so the cross-validated figure
+above is a meaningful guide to how it will behave on unseen alerts rather than a
+number about a different population.</p>
+
 <h2>What this estimate does and does not say</h2>
 <p>Feature selection and hyperparameter tuning were both carried out on these same
 cross-validation folds, so the figure above is optimistic as an estimate of unseen

@@ -173,9 +173,14 @@ def predict_from_saved():
             f"{len(columns)} columns vs {summary['n_columns']} recorded. "
             f"The artifacts are stale; re-run `python -m src.pipeline`."
         )
-    return _predict_and_write(
+    drift = _predict_and_write(
         summary["families"], columns, summary["weights"], summary["tuned_params"]
     )
+    # The adversarial AUC is a headline finding; keep it in the record the site
+    # and notebook read, not only on stdout.
+    summary.update(drift)
+    SUMMARY_PATH.write_text(json.dumps(summary, indent=2, default=float))
+    return drift
 
 
 if __name__ == "__main__":

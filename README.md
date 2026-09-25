@@ -19,11 +19,13 @@ pip install -r requirements.txt
 Place the organizer-supplied files in `fintech_data/`. They are gitignored and
 never committed.
 
-**Download `test_transactions.parquet` in binary mode.** The copy we were first
-given had been read as text and re-encoded as UTF-8, replacing every byte above
-0x7F with U+FFFD — 16,902,498 times. Its `PAR1` header and footer survive, so it
-looks valid until the Thrift footer is parsed, and no parser can recover it.
-Verify any replacement with:
+**Extract the archive with a real unzip tool.** Our first working copy of
+`test_transactions.parquet` had been read as text and re-encoded as UTF-8 during
+extraction, replacing every byte above 0x7F with U+FFFD — 16,902,498 times, which
+inflated the file from 41 MB to 74 MB. Its `PAR1` header and footer survive, so it
+looks valid until the Thrift footer is parsed, and no parser can recover it. The
+downloaded archive itself was fine; only the extraction was lossy. Verify after
+extracting:
 
 ```bash
 python -c "import pyarrow.parquet as pq; print(pq.ParquetFile('fintech_data/test_transactions.parquet').metadata.num_rows)"
@@ -33,13 +35,9 @@ python -c "import pyarrow.parquet as pq; print(pq.ParquetFile('fintech_data/test
 
 | Deliverable | Where | How to rebuild |
 | --- | --- | --- |
-| Prediction CSV | `outputs/team_2ABB3C78.csv` — **not yet produced**, see below | `python -m src.pipeline` |
+| Prediction CSV | `outputs/team_2ABB3C78.csv` | `python -m src.pipeline` |
 | EDA website | `docs/index.html` | `python -m src.build_site` |
 | Reproducible notebook | `notebooks/final_solution.ipynb` | see below |
-
-The prediction CSV does not exist yet: it cannot be produced until the corrupt
-`test_transactions.parquet` above is replaced. Everything needed to generate it is
-in place, and `python -m src.pipeline` writes it in one step once the file is valid.
 
 The website is static: charts are pre-rendered to inline data URIs, so the page
 needs no runtime, no server, and no data files. Publish `docs/` on GitHub Pages
@@ -95,6 +93,14 @@ choice pushes the same direction: regularization-biased hyperparameter search
 (small `num_leaves`, large `min_child_samples`, strong `reg_lambda`), bagging over
 multiple seeds, and equal-weight rank averaging unless fitted weights beat it by
 at least 0.001 AUC on out-of-fold predictions.
+
+### Do train and test look alike?
+
+Before predicting, we train a classifier to separate training alerts from scoring
+alerts using the same features the model uses. It reaches **ROC-AUC 0.4921** — the
+two sets are indistinguishable. That matters: it means the cross-validated figure
+describes the population the model is actually asked to score, rather than a
+different one.
 
 ### How to read our numbers
 

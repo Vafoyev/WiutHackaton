@@ -276,5 +276,18 @@
     "logreg": {
       "C": 3.033713464539809
     }
+  },
+  "adversarial_auc": 0.4921337261904762,
+  "top_drifting": {
+    "base_span": 4203.0,
+    "ty_sh_naqd": 3545.0,
+    "base_max": 3508.0,
+    "base_std": 3483.0,
+    "dir_n_chiqim": 3374.0,
+    "base_min": 3350.0,
+    "ty_sh_karta": 3136.0,
+    "ty_m_naqd": 2973.0,
+    "ty_s_naqd": 2737.0,
+    "dir_s_chiqim": 2668.0
   }
 }
