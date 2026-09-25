@@ -7,8 +7,7 @@ __pycache__/
 # Competition data — never commit (162MB, organizer-supplied)
 fintech_data/
 
-# Generated artifacts
-outputs/
+# Generated artifacts (the submission CSV itself IS committed)
 experiments/*.pkl
 *.parquet
 !site_data/*.parquet
