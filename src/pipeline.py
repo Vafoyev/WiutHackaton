@@ -8,7 +8,7 @@ from sklearn.metrics import roc_auc_score
 from src import config
 from src.adversarial import drift_report
 from src.data import CorruptParquetError, load_signals, load_transactions
-from src.ensemble import choose, rank_average
+from src.ensemble import choose, rank_average, score_blend
 from src.features import FEATURE_FAMILIES, build_features, prepare_transactions
 from src.models import bagged_predict, make_factory
 from src.selection import eliminate_columns, load_selection, save_selection, select_families
@@ -47,17 +47,30 @@ def run(tune_trials: int = 40, skip_test: bool = False) -> dict:
     print(f"  kept {len(columns)} columns")
 
     print("Tuning...")
-    tuned, oof, scores = {}, {}, {}
+    tuned, oof, per_repeat, scores, means = {}, {}, {}, {}, {}
     for name in MODELS:
         params = tune(name, X, y, n_trials=tune_trials)
         result = evaluate(make_factory(name, params), X, y)
         log_run(result, families=families, n_columns=X.shape[1], model=name, params=params)
-        tuned[name], oof[name], scores[name] = params, result.oof, result.score
+        tuned[name], oof[name] = params, result.oof
+        per_repeat[name] = result.oof_per_repeat
+        scores[name], means[name] = result.score, result.mean
         print(f"  {name}: mean={result.mean:.5f} std={result.std:.5f} score={result.score:.5f}")
 
     weights, method = choose(oof, y)
-    blended_auc = float(roc_auc_score(y, rank_average(oof, weights)))
-    print(f"Ensemble ({method}) OOF AUC: {blended_auc:.5f}")
+    # Scored per repeat then averaged, exactly as each single model above is.
+    # Scoring on repeat-averaged OOF instead inflates AUC by roughly 0.004 here
+    # and would make the ensemble look better than the models it is compared to.
+    blend_mean, blend_std, _ = score_blend(per_repeat, y, weights)
+    best_single = max(means, key=means.get)
+    print(
+        f"Ensemble ({method}): mean={blend_mean:.5f} std={blend_std:.5f} "
+        f"score={blend_mean - blend_std:.5f}"
+    )
+    print(
+        f"  best single model: {best_single} mean={means[best_single]:.5f} "
+        f"-> ensemble gain {blend_mean - means[best_single]:+.5f}"
+    )
 
     summary = {
         "families": families,
@@ -65,7 +78,14 @@ def run(tune_trials: int = 40, skip_test: bool = False) -> dict:
         "model_scores": scores,
         "weights": weights,
         "weighting": method,
-        "ensemble_oof_auc": blended_auc,
+        "ensemble_cv_mean": blend_mean,
+        "ensemble_cv_std": blend_std,
+        "ensemble_score": blend_mean - blend_std,
+        "best_single_model": best_single,
+        "best_single_cv_mean": means[best_single],
+        "ensemble_gain_over_best_single": blend_mean - means[best_single],
+        "model_cv_means": means,
+        "selected_columns": columns,
         "selection_history": history,
         "tuned_params": tuned,
     }

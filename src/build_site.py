@@ -101,7 +101,18 @@ def build(output_dir: Path | None = None) -> Path:
         alerts=f"{len(signals):,}",
         transactions=f"{len(tx):,}",
         columns=summary.get("n_columns", "—"),
-        auc=f"{summary.get('ensemble_oof_auc', float('nan')):.4f}",
+        auc=f"{summary.get('ensemble_cv_mean', float('nan')):.4f}",
+        auc_std=f"{summary.get('ensemble_cv_std', float('nan')):.4f}",
+        best_single=summary.get("best_single_model", "—"),
+        best_single_auc=f"{summary.get('best_single_cv_mean', float('nan')):.4f}",
+        gain=f"{summary.get('ensemble_gain_over_best_single', float('nan')):+.4f}",
+        chance_families=sum(
+            1 for r in summary.get("selection_history", [])
+            if r.get("n_columns") and not r["accepted"] and r["mean"] <= 0.51
+        ),
+        rejected_families=len({
+            r["family"] for r in summary.get("selection_history", [])
+        }) - len(summary.get("families", [])),
         ablation_rows=ablation_rows or "<tr><td colspan='5'>Run the pipeline first.</td></tr>",
         **charts,
     )
@@ -148,7 +159,7 @@ by escalation probability with a seed-bagged gradient-boosting ensemble.</p>
 <div class="metric"><b>{rate}</b><span>escalation rate</span></div>
 <div class="metric"><b>{transactions}</b><span>transactions</span></div>
 <div class="metric"><b>{columns}</b><span>features kept</span></div>
-<div class="metric"><b>{auc}</b><span>OOF ROC-AUC</span></div>
+<div class="metric"><b>{auc}</b><span>CV ROC-AUC (&plusmn;{auc_std})</span></div>
 </div>
 
 <h2>Target distribution</h2>
@@ -170,7 +181,8 @@ by escalation probability with a seed-bagged gradient-boosting ensemble.</p>
 <div class="finding">
 <p>We measured every feature family by repeated cross-validation instead of assuming
 it helped. Accuracy peaked at a compact feature set; adding the remaining families
-<em>reduced</em> ROC-AUC. Four families scored at chance on their own.</p>
+<em>reduced</em> ROC-AUC. Of the nine families built, {rejected_families} were rejected,
+and {chance_families} of those scored at or below chance on their own.</p>
 <p>This dataset carries little signal, so the binding constraint is variance, not
 capacity. That reading drove every later choice: repeated cross-validation rather than
 a single split, an acceptance rule of <code>mean &minus; std</code>, regularization-biased
@@ -179,6 +191,23 @@ hyperparameters, and seed bagging.</p>
 
 <table><thead><tr><th>Family added</th><th>Columns</th><th>CV mean</th><th>CV std</th><th>Decision</th></tr></thead>
 <tbody>{ablation_rows}</tbody></table>
+
+<h2>How the ensemble was scored</h2>
+<p>Every number on this page is the mean ROC-AUC across four repeats of 5-fold
+cross-validation. The ensemble is scored the same way as a single model &mdash; blended
+within each repeat, then averaged &mdash; rather than by scoring the average of the
+repeats, which inflates ROC-AUC on its own by roughly 0.004 here. Measured honestly,
+the four-model rank average buys <b>{gain}</b> over the best single model
+({best_single}, {best_single_auc}).</p>
+
+<h2>What this estimate does and does not say</h2>
+<p>Feature selection and hyperparameter tuning were both carried out on these same
+cross-validation folds, so the figure above is optimistic as an estimate of unseen
+performance &mdash; the columns that survived were chosen with all 14,000 labels visible.
+It is a sound basis for <em>ranking our own candidates against each other</em>, which is
+what we used it for, and it is not a held-out estimate. The per-model scores also
+describe unbagged models; the submitted predictions average five seeds, which we
+expect to help slightly but did not separately measure.</p>
 
 <h2>Conclusion</h2>
 <p>A compact, measured feature set with a regularized ensemble ranks alerts better than
