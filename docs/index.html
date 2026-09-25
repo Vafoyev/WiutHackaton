@@ -34,7 +34,7 @@ by escalation probability with a seed-bagged gradient-boosting ensemble.</p>
 <div class="metric"><b>17.2%</b><span>escalation rate</span></div>
 <div class="metric"><b>6,986,823</b><span>transactions</span></div>
 <div class="metric"><b>19</b><span>features kept</span></div>
-<div class="metric"><b>0.6379</b><span>OOF ROC-AUC</span></div>
+<div class="metric"><b>0.6364</b><span>CV ROC-AUC (&plusmn;0.0011)</span></div>
 </div>
 
 <h2>Target distribution</h2>
@@ -56,7 +56,8 @@ by escalation probability with a seed-bagged gradient-boosting ensemble.</p>
 <div class="finding">
 <p>We measured every feature family by repeated cross-validation instead of assuming
 it helped. Accuracy peaked at a compact feature set; adding the remaining families
-<em>reduced</em> ROC-AUC. Four families scored at chance on their own.</p>
+<em>reduced</em> ROC-AUC. Of the nine families built, 7 were rejected,
+and 3 of those scored at or below chance on their own.</p>
 <p>This dataset carries little signal, so the binding constraint is variance, not
 capacity. That reading drove every later choice: repeated cross-validation rather than
 a single split, an acceptance rule of <code>mean &minus; std</code>, regularization-biased
@@ -65,6 +66,23 @@ hyperparameters, and seed bagging.</p>
 
 <table><thead><tr><th>Family added</th><th>Columns</th><th>CV mean</th><th>CV std</th><th>Decision</th></tr></thead>
 <tbody><tr><td>base</td><td>7</td><td>0.56825</td><td>0.00156</td><td>rejected</td></tr><tr><td>amount_shape</td><td>11</td><td>0.54525</td><td>0.00334</td><td>rejected</td></tr><tr><td>direction_type</td><td>24</td><td>0.60198</td><td>0.00082</td><td>kept</td></tr><tr><td>cross</td><td>16</td><td>0.51062</td><td>0.00177</td><td>rejected</td></tr><tr><td>flow</td><td>4</td><td>0.52184</td><td>0.00115</td><td>rejected</td></tr><tr><td>windows</td><td>46</td><td>0.53723</td><td>0.00260</td><td>rejected</td></tr><tr><td>burst</td><td>7</td><td>0.50094</td><td>0.00223</td><td>rejected</td></tr><tr><td>hour</td><td>7</td><td>0.50291</td><td>0.00393</td><td>rejected</td></tr><tr><td>signal_date</td><td>6</td><td>0.49742</td><td>0.00146</td><td>rejected</td></tr><tr><td>base</td><td>31</td><td>0.61606</td><td>0.00089</td><td>kept</td></tr><tr><td>amount_shape</td><td>35</td><td>0.59817</td><td>0.00149</td><td>rejected</td></tr><tr><td>cross</td><td>40</td><td>0.59564</td><td>0.00169</td><td>rejected</td></tr><tr><td>flow</td><td>28</td><td>0.59760</td><td>0.00125</td><td>rejected</td></tr><tr><td>windows</td><td>70</td><td>0.59048</td><td>0.00209</td><td>rejected</td></tr><tr><td>burst</td><td>31</td><td>0.59440</td><td>0.00117</td><td>rejected</td></tr><tr><td>hour</td><td>31</td><td>0.59619</td><td>0.00189</td><td>rejected</td></tr><tr><td>signal_date</td><td>30</td><td>0.59521</td><td>0.00128</td><td>rejected</td></tr><tr><td>amount_shape</td><td>42</td><td>0.61329</td><td>0.00074</td><td>rejected</td></tr><tr><td>cross</td><td>47</td><td>0.61226</td><td>0.00096</td><td>rejected</td></tr><tr><td>flow</td><td>35</td><td>0.61370</td><td>0.00166</td><td>rejected</td></tr><tr><td>windows</td><td>77</td><td>0.60784</td><td>0.00263</td><td>rejected</td></tr><tr><td>burst</td><td>38</td><td>0.61125</td><td>0.00188</td><td>rejected</td></tr><tr><td>hour</td><td>38</td><td>0.61306</td><td>0.00137</td><td>rejected</td></tr><tr><td>signal_date</td><td>37</td><td>0.61086</td><td>0.00166</td><td>rejected</td></tr></tbody></table>
+
+<h2>How the ensemble was scored</h2>
+<p>Every number on this page is the mean ROC-AUC across four repeats of 5-fold
+cross-validation. The ensemble is scored the same way as a single model &mdash; blended
+within each repeat, then averaged &mdash; rather than by scoring the average of the
+repeats, which inflates ROC-AUC on its own by roughly 0.004 here. Measured honestly,
+the four-model rank average buys <b>+0.0039</b> over the best single model
+(xgboost, 0.6325).</p>
+
+<h2>What this estimate does and does not say</h2>
+<p>Feature selection and hyperparameter tuning were both carried out on these same
+cross-validation folds, so the figure above is optimistic as an estimate of unseen
+performance &mdash; the columns that survived were chosen with all 14,000 labels visible.
+It is a sound basis for <em>ranking our own candidates against each other</em>, which is
+what we used it for, and it is not a held-out estimate. The per-model scores also
+describe unbagged models; the submitted predictions average five seeds, which we
+expect to help slightly but did not separately measure.</p>
 
 <h2>Conclusion</h2>
 <p>A compact, measured feature set with a regularized ensemble ranks alerts better than

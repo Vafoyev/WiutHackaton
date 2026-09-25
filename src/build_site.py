@@ -106,10 +106,11 @@ def build(output_dir: Path | None = None) -> Path:
         best_single=summary.get("best_single_model", "—"),
         best_single_auc=f"{summary.get('best_single_cv_mean', float('nan')):.4f}",
         gain=f"{summary.get('ensemble_gain_over_best_single', float('nan')):+.4f}",
-        chance_families=sum(
-            1 for r in summary.get("selection_history", [])
-            if r.get("n_columns") and not r["accepted"] and r["mean"] <= 0.51
-        ),
+        # "At chance" by the project's own metric: mean - std does not clear 0.5.
+        chance_families=len({
+            r["family"] for r in summary.get("selection_history", [])
+            if r["score"] <= 0.5
+        }),
         rejected_families=len({
             r["family"] for r in summary.get("selection_history", [])
         }) - len(summary.get("families", [])),
