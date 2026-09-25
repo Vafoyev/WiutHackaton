@@ -10,7 +10,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from xgboost import XGBClassifier
 
-from src.config import SEED
+from src.config import N_JOBS, SEED
 
 DEFAULTS: dict[str, dict] = {
     "lightgbm": {
@@ -50,18 +50,18 @@ def default_params(name: str) -> dict:
 
 
 def _lightgbm(params: dict) -> Callable[[int], object]:
-    return lambda seed: LGBMClassifier(random_state=seed, verbose=-1, n_jobs=-1, **params)
+    return lambda seed: LGBMClassifier(random_state=seed, verbose=-1, n_jobs=N_JOBS, **params)
 
 
 def _xgboost(params: dict) -> Callable[[int], object]:
     return lambda seed: XGBClassifier(
-        random_state=seed, n_jobs=-1, eval_metric="auc", tree_method="hist", **params
+        random_state=seed, n_jobs=N_JOBS, eval_metric="auc", tree_method="hist", **params
     )
 
 
 def _catboost(params: dict) -> Callable[[int], object]:
     return lambda seed: CatBoostClassifier(
-        random_seed=seed, verbose=0, allow_writing_files=False, **params
+        random_seed=seed, verbose=0, allow_writing_files=False, thread_count=N_JOBS, **params
     )
 
 

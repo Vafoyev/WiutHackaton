@@ -20,6 +20,8 @@ class CVResult:
     mean: float
     std: float
     oof: np.ndarray
+    oof_per_repeat: np.ndarray
+    repeat_scores: tuple[float, ...]
 
     @property
     def score(self) -> float:
@@ -43,7 +45,7 @@ def evaluate(
 ) -> CVResult:
     """Repeated stratified CV. Returns per-repeat mean/std and averaged OOF."""
     y = pd.Series(np.asarray(y), index=X.index)
-    oof_sum = np.zeros(len(X))
+    per_repeat = np.zeros((n_repeats, len(X)))
     repeat_scores: list[float] = []
 
     for repeat in range(n_repeats):
@@ -58,12 +60,14 @@ def evaluate(
             model.fit(X_fit, y.iloc[train_idx])
             oof[valid_idx] = model.predict_proba(X_val)[:, 1]
         repeat_scores.append(roc_auc_score(y, oof))
-        oof_sum += oof
+        per_repeat[repeat] = oof
 
     return CVResult(
         mean=float(np.mean(repeat_scores)),
         std=float(np.std(repeat_scores)),
-        oof=oof_sum / n_repeats,
+        oof=per_repeat.mean(axis=0),
+        oof_per_repeat=per_repeat,
+        repeat_scores=tuple(repeat_scores),
     )
 
 

@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import numpy as np
@@ -20,6 +21,7 @@ def check(frame: pd.DataFrame, expected_ids: pd.Series) -> list[tuple[str, bool,
     duplicates = pd.Series(actual).duplicated().sum()
     out_of_range = (~probabilities.between(0.0, 1.0)).sum() if len(probabilities) else 0
     null_count = probabilities.isna().sum() if len(probabilities) else 0
+    distinct = probabilities.nunique(dropna=True) if len(probabilities) else 0
 
     return [
         ("columns are exactly [signal_id, ehtimollik]", list(frame.columns) == [ID, PROBA],
@@ -31,6 +33,10 @@ def check(frame: pd.DataFrame, expected_ids: pd.Series) -> list[tuple[str, bool,
         ("no duplicate IDs", duplicates == 0, f"{duplicates} duplicated"),
         ("no null probabilities", null_count == 0, f"{null_count} null"),
         ("all probabilities within [0, 1]", out_of_range == 0, f"{out_of_range} out of range"),
+        # The organizer's sample_submission is 6000 identical values and would
+        # otherwise pass every rule above with a clean report.
+        ("predictions are not a constant placeholder", distinct > 1,
+         f"{distinct} distinct value(s)"),
     ]
 
 
@@ -53,5 +59,12 @@ def write(
 
     target = (OUTPUTS / SUBMISSION_NAME) if path is None else path
     target.parent.mkdir(parents=True, exist_ok=True)
-    ordered.to_csv(target, index=False)
+    # Write then rename, so a failure mid-serialization cannot leave a partial
+    # CSV where a complete one is expected.
+    staging = target.with_suffix(target.suffix + ".part")
+    try:
+        ordered.to_csv(staging, index=False)
+        os.replace(staging, target)
+    finally:
+        staging.unlink(missing_ok=True)
     return target

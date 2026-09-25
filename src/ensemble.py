@@ -47,6 +47,32 @@ def fit_weights(oof: dict[str, np.ndarray], y: pd.Series) -> dict[str, float]:
     return {name: float(value) for name, value in zip(names, raw)}
 
 
+def score_blend(
+    oof_per_repeat: dict[str, np.ndarray],
+    y: pd.Series,
+    weights: dict[str, float],
+) -> tuple[float, float, list[float]]:
+    """Score a blend the way a single model is scored: per repeat, then averaged.
+
+    Scoring on repeat-averaged OOF instead inflates AUC on its own, which would
+    make the ensemble look better than the single models it is compared against.
+    """
+    n_repeats = next(iter(oof_per_repeat.values())).shape[0]
+    scores = [
+        float(
+            roc_auc_score(
+                y,
+                rank_average(
+                    {name: vectors[repeat] for name, vectors in oof_per_repeat.items()},
+                    weights,
+                ),
+            )
+        )
+        for repeat in range(n_repeats)
+    ]
+    return float(np.mean(scores)), float(np.std(scores)), scores
+
+
 def choose(
     oof: dict[str, np.ndarray],
     y: pd.Series,

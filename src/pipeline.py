@@ -76,10 +76,13 @@ def run(tune_trials: int = 40, skip_test: bool = False) -> dict:
         print("skip_test=True — stopping before prediction.")
         return summary
 
-    drift = _predict_and_write(families, columns, weights, tuned)
+    drift = _predict_and_write(families, columns, weights, tuned, X=X, y=y)
     summary.update(drift)
     SUMMARY_PATH.write_text(json.dumps(summary, indent=2, default=float))
     return summary
+
+
+DRIFT_WARNING_AUC = 0.75
 
 
 def _predict_and_write(
@@ -87,12 +90,15 @@ def _predict_and_write(
     columns: list[str],
     weights: dict[str, float],
     tuned: dict[str, dict],
+    X: pd.DataFrame | None = None,
+    y: pd.Series | None = None,
 ) -> dict:
     """Build test features, report drift, and write the validated submission."""
     train_signals = load_signals(config.TRAIN_SIGNALS)
-    y = train_signals[config.TARGET]
-    train_tx = prepare_transactions(load_transactions(config.TRAIN_TX), train_signals)
-    X = build_features(train_tx, train_signals, families=families)[columns]
+    if X is None or y is None:
+        y = train_signals[config.TARGET]
+        train_tx = prepare_transactions(load_transactions(config.TRAIN_TX), train_signals)
+        X = build_features(train_tx, train_signals, families=families)[columns]
 
     try:
         test_signals = load_signals(config.TEST_SIGNALS)
@@ -101,11 +107,20 @@ def _predict_and_write(
         print(f"\nCannot predict: {exc}")
         raise
 
-    X_test = build_features(test_tx, test_signals, families=families)[columns]
+    X_test = build_features(
+        test_tx, test_signals, families=families, reference=train_signals
+    )[columns]
 
     auc, drifting = drift_report(X, X_test)
     print(f"Adversarial validation AUC: {auc:.4f}")
     print("Top drifting columns:\n", drifting.head(10))
+    if auc > DRIFT_WARNING_AUC:
+        print(
+            f"\nWARNING: train and test are separable at AUC {auc:.4f} "
+            f"(> {DRIFT_WARNING_AUC}). The features above differ systematically "
+            f"between splits; the CV estimate may not transfer. Inspect them "
+            f"before trusting this submission."
+        )
 
     predictions = {
         name: bagged_predict(name, tuned[name], X, y, X_test) for name in MODELS
@@ -128,11 +143,18 @@ def predict_from_saved():
             f"it records the chosen families, the frozen columns, and the tuned params."
         )
     summary = json.loads(SUMMARY_PATH.read_text())
+    columns = load_selection()["columns"]
+    # run() writes the selection file before summary.json, so a crash during
+    # tuning leaves a new selection beside a stale summary. Predicting from the
+    # pair would use one run's columns with another run's hyperparameters.
+    if len(columns) != summary["n_columns"]:
+        raise ValueError(
+            f"selected_features.json and summary.json disagree: "
+            f"{len(columns)} columns vs {summary['n_columns']} recorded. "
+            f"The artifacts are stale; re-run `python -m src.pipeline`."
+        )
     return _predict_and_write(
-        summary["families"],
-        load_selection()["columns"],
-        summary["weights"],
-        summary["tuned_params"],
+        summary["families"], columns, summary["weights"], summary["tuned_params"]
     )
 
 

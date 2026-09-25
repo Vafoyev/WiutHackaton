@@ -70,3 +70,43 @@ def test_all_families_are_registered_and_produce_columns():
         frame = build_features(prepared, signals, families=[name])
         assert frame.shape[1] > 0, name
         assert list(frame.index) == ["SG_1", "SG_2", "SG_3"], name
+
+
+def test_duplicate_signal_ids_do_not_multiply_aggregates():
+    """A signal listed twice must not double its own transactions."""
+    signals = pd.concat([_signals(), _signals().iloc[[0]]], ignore_index=True)
+    prepared = prepare_transactions(_transactions(), signals)
+    result = build_features(prepared, signals)
+
+    assert not result.index.duplicated().any()
+    assert result.loc["SG_1", "base_cnt"] == 2
+
+
+def test_zero_transaction_signals_get_nan_not_zero_for_amount_columns():
+    """0.0 is a reachable real sum, so it must not stand for 'no activity'."""
+    signals = _signals()
+    result = build_features(prepare_transactions(_transactions(), signals), signals)
+    row = result.loc["SG_3"]
+
+    assert row["base_cnt"] == 0
+    assert row["dir_n_kirim"] == 0
+    for column in ("dir_s_kirim", "dir_s_chiqim", "ty_s_karta", "base_sum", "flow_net"):
+        assert pd.isna(row[column]), column
+
+
+def test_signal_date_features_are_computed_against_a_fixed_reference():
+    """sig_tnum and sig_same_day_n must not depend on which split they are in."""
+    train = _signals()
+    test = train.iloc[[0]].copy()
+    test["signal_id"] = ["SG_9"]
+
+    train_feat = build_features(
+        prepare_transactions(_transactions(), train), train, families=["signal_date"]
+    )
+    test_feat = build_features(
+        prepare_transactions(_transactions().iloc[:0], test), test,
+        families=["signal_date"], reference=train,
+    )
+
+    assert test_feat.loc["SG_9", "sig_tnum"] == train_feat.loc["SG_1", "sig_tnum"]
+    assert test_feat.loc["SG_9", "sig_same_day_n"] == train_feat.loc["SG_1", "sig_same_day_n"]

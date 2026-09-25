@@ -7,7 +7,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.inspection import permutation_importance
 from sklearn.model_selection import train_test_split
 
-from src.config import EXPERIMENTS, SEED
+from src.config import EXPERIMENTS, N_JOBS, SEED
 from src.models import default_params, make_factory
 from src.validation import evaluate, log_run
 
@@ -93,7 +93,7 @@ def eliminate_columns(
         scoring="roc_auc",
         n_repeats=n_repeats,
         random_state=SEED,
-        n_jobs=-1,
+        n_jobs=N_JOBS,
     )
     kept = [c for c, m in zip(X.columns, importance.importances_mean) if m > 0]
     return kept or list(X.columns)

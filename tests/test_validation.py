@@ -53,3 +53,15 @@ def test_log_run_appends_a_row(tmp_path, monkeypatch):
     rows = pd.read_csv(tmp_path / "log.csv")
     assert len(rows) == 2
     assert {"timestamp", "families", "n_columns", "model", "cv_mean", "cv_std", "score"} <= set(rows.columns)
+
+
+def test_cvresult_exposes_per_repeat_oof_so_blends_can_be_scored_the_same_way():
+    """Scoring a blend on repeat-averaged OOF inflates AUC relative to the
+    per-repeat mean the single-model numbers use. Comparing the two is invalid,
+    so per-repeat vectors must be available to score a blend consistently."""
+    X, y = _dataset()
+    result = evaluate(lambda seed: LogisticRegression(random_state=seed), X, y, n_repeats=3)
+    assert result.oof_per_repeat.shape == (3, len(y))
+    np.testing.assert_allclose(result.oof_per_repeat.mean(axis=0), result.oof)
+    assert len(result.repeat_scores) == 3
+    assert result.mean == float(np.mean(result.repeat_scores))

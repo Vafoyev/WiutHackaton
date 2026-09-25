@@ -2,6 +2,11 @@ from pathlib import Path
 
 SEED = 42
 
+# LightGBM and XGBoost are deterministic for a fixed thread count, not across
+# thread counts. n_jobs=-1 resolves to the host core count, so the same seed on
+# a different machine would produce different trees and a different selection.
+N_JOBS = 4
+
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "fintech_data"
 EXPERIMENTS = ROOT / "experiments"

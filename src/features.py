@@ -9,8 +9,11 @@ COUNT_PREFIXES = ("base_cnt", "dir_n_", "ty_n_", "cross_n_", "win_n", "hour_acti
 
 
 def prepare_transactions(tx: pd.DataFrame, signals: pd.DataFrame) -> pd.DataFrame:
+    # A signal_id listed twice would left-merge each of its transactions twice,
+    # silently doubling every count, sum and share for that alert.
+    unique_signals = signals.drop_duplicates("signal_id")
     merged = tx.merge(
-        signals[["signal_id", "signal_sanasi"]], on="signal_id", how="left"
+        unique_signals[["signal_id", "signal_sanasi"]], on="signal_id", how="left"
     )
     delta = merged["signal_sanasi"] - merged["tranzaksiya_vaqti"]
     merged["days_before"] = delta.dt.total_seconds() / 86400.0
@@ -174,15 +177,26 @@ def _hour(tx: pd.DataFrame, index: pd.Index) -> pd.DataFrame:
     return out
 
 
-def _signal_date(tx: pd.DataFrame, index: pd.Index, signals: pd.DataFrame) -> pd.DataFrame:
-    dates = signals.set_index("signal_id")["signal_sanasi"].reindex(index)
+def _signal_date(
+    tx: pd.DataFrame,
+    index: pd.Index,
+    signals: pd.DataFrame,
+    reference: pd.DataFrame | None = None,
+) -> pd.DataFrame:
+    frame = signals.drop_duplicates("signal_id")
+    dates = frame.set_index("signal_id")["signal_sanasi"].reindex(index)
+    # Anchor both to the reference split, otherwise the same calendar date maps
+    # to a different sig_tnum in test, and sig_same_day_n scales with split size.
+    anchor = (reference if reference is not None else frame).drop_duplicates("signal_id")
+    anchor_dates = anchor["signal_sanasi"]
+
     out = pd.DataFrame(index=index)
     out["sig_month"] = dates.dt.month
     out["sig_dow"] = dates.dt.dayofweek
     out["sig_day"] = dates.dt.day
     out["sig_week"] = dates.dt.isocalendar().week.astype("float64")
-    out["sig_tnum"] = (dates - dates.min()).dt.days
-    out["sig_same_day_n"] = dates.map(dates.value_counts())
+    out["sig_tnum"] = (dates - anchor_dates.min()).dt.days
+    out["sig_same_day_n"] = dates.map(anchor_dates.value_counts())
     return out
 
 
@@ -198,20 +212,46 @@ FEATURE_FAMILIES: dict[str, Callable] = {
     "signal_date": _signal_date,
 }
 
+# Families whose builder needs the reference split for train/test-stable values.
+REFERENCE_AWARE = ("signal_date",)
+
 
 def build_features(
     tx: pd.DataFrame,
     signals: pd.DataFrame,
     families: Sequence[str] | None = None,
+    reference: pd.DataFrame | None = None,
 ) -> pd.DataFrame:
     names = list(FEATURE_FAMILIES) if families is None else list(families)
-    index = pd.Index(signals["signal_id"], name="signal_id")
-    parts = [FEATURE_FAMILIES[name](tx, index, signals) for name in names]
-    result = pd.concat(parts, axis=1)
-    result = result.reindex(index)
+    unique_signals = signals.drop_duplicates("signal_id")
+    index = pd.Index(unique_signals["signal_id"], name="signal_id")
+
+    parts = []
+    for name in names:
+        builder = FEATURE_FAMILIES[name]
+        if name in REFERENCE_AWARE:
+            parts.append(builder(tx, index, unique_signals, reference))
+        else:
+            parts.append(builder(tx, index, unique_signals))
+
+    result = pd.concat(parts, axis=1).reindex(index)
     for column in result.columns:
         if column.startswith(COUNT_PREFIXES):
             result[column] = result[column].fillna(0)
+
+    # An alert with no transactions at all must stay unknown, not zero:
+    # miqdor_indeksi is signed, so 0.0 is a reachable real sum and would make
+    # "no activity" indistinguishable from "inflows cancelled outflows".
+    # sig_* columns come from the alert date and are known regardless.
+    silent = index.difference(pd.Index(tx["signal_id"].unique()))
+    if len(silent):
+        unknown = [
+            c
+            for c in result.columns
+            if not c.startswith(COUNT_PREFIXES) and not c.startswith("sig_")
+        ]
+        result.loc[silent, unknown] = np.nan
+
     return result.replace([np.inf, -np.inf], np.nan)
 
 

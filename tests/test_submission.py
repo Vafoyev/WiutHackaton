@@ -58,3 +58,31 @@ def test_write_preserves_expected_id_order(tmp_path):
     write(shuffled, _expected(), path=target)
     reloaded = pd.read_csv(target)
     assert list(reloaded[ID]) == list(_expected())
+
+
+def test_check_rejects_a_constant_placeholder_submission():
+    """The organizer's sample_submission is 6000 rows of 0.5 and passed every
+    rule, so a clean PASS report could accompany a 0.5-AUC file."""
+    placeholder = pd.DataFrame({ID: _expected(), PROBA: [0.5] * 5})
+    results = check(placeholder, _expected())
+    assert any(not passed for _, passed, _ in results)
+
+
+def test_write_refuses_a_constant_placeholder(tmp_path):
+    target = tmp_path / "out.csv"
+    placeholder = pd.DataFrame({ID: _expected(), PROBA: [0.5] * 5})
+    with pytest.raises(SubmissionError):
+        write(placeholder, _expected(), path=target)
+    assert not target.exists()
+
+
+def test_write_leaves_no_partial_file_if_serialization_fails(tmp_path, monkeypatch):
+    target = tmp_path / "out.csv"
+
+    def explode(*args, **kwargs):
+        raise OSError("disk full")
+
+    monkeypatch.setattr(pd.DataFrame, "to_csv", explode)
+    with pytest.raises(OSError):
+        write(_good(), _expected(), path=target)
+    assert not target.exists()
