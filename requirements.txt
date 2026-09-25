@@ -1,6 +1,13 @@
 pandas>=2.2
 pyarrow>=15
 scikit-learn>=1.4
-streamlit>=1.35
 matplotlib>=3.8
 jupyter>=1.0
+nbconvert>=7.0
+lightgbm>=4.7
+xgboost>=3.4
+catboost>=1.2
+optuna>=5.0
+shap>=0.46
+scipy>=1.14
+pytest>=8.0

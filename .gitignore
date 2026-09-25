@@ -11,3 +11,4 @@ fintech_data/
 experiments/*.pkl
 *.parquet
 !site_data/*.parquet
+.pytest_cache/
