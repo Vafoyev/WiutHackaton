@@ -11,7 +11,13 @@ from src.data import CorruptParquetError, load_signals, load_transactions
 from src.ensemble import choose, rank_average, score_blend
 from src.features import FEATURE_FAMILIES, build_features, prepare_transactions
 from src.models import bagged_predict, make_factory
-from src.selection import eliminate_columns, load_selection, save_selection, select_families
+from src.selection import (
+    eliminate_columns,
+    load_selection,
+    save_selection,
+    select_columns_globally,
+    select_families,
+)
 from src.submission import write
 from src.tuning import tune
 from src.validation import evaluate, log_run
@@ -34,16 +40,23 @@ def run(tune_trials: int = 40, skip_test: bool = False) -> dict:
         load_transactions(config.TRAIN_TX), train_signals
     )
 
-    print("Selecting feature families...")
+    print("Ranking feature families (recorded for the write-up)...")
     by_family = _family_frames(train_tx, train_signals)
     families, history = select_families(by_family, y)
-    print("  chosen:", families)
+    print("  family-level search would keep:", families)
 
-    X = pd.concat([by_family[name] for name in families], axis=1)
-    print(f"Eliminating columns from {X.shape[1]}...")
-    columns = eliminate_columns(X, y)
-    X = X[columns]
-    save_selection(columns, families)
+    # Selection happens across ALL columns, not within the chosen families:
+    # family-level greedy search discards every column of a rejected family,
+    # and several columns in the global top 15 come from rejected families.
+    X_all = pd.concat(by_family.values(), axis=1)
+    print(f"Selecting columns globally from {X_all.shape[1]}...")
+    columns, size_trace = select_columns_globally(X_all, y)
+    X = X_all[columns]
+    all_families = list(by_family)
+    save_selection(columns, all_families)
+    for row in size_trace:
+        print(f"  top{row['size']:<3} mean={row['mean']:.5f} std={row['std']:.5f} "
+              f"score={row['score']:.5f}")
     print(f"  kept {len(columns)} columns")
 
     print("Tuning...")
@@ -51,7 +64,7 @@ def run(tune_trials: int = 40, skip_test: bool = False) -> dict:
     for name in MODELS:
         params = tune(name, X, y, n_trials=tune_trials)
         result = evaluate(make_factory(name, params), X, y)
-        log_run(result, families=families, n_columns=X.shape[1], model=name, params=params)
+        log_run(result, families=all_families, n_columns=X.shape[1], model=name, params=params)
         tuned[name], oof[name] = params, result.oof
         per_repeat[name] = result.oof_per_repeat
         scores[name], means[name] = result.score, result.mean
@@ -73,7 +86,9 @@ def run(tune_trials: int = 40, skip_test: bool = False) -> dict:
     )
 
     summary = {
-        "families": families,
+        "families": all_families,
+        "family_level_would_keep": families,
+        "column_size_trace": size_trace,
         "n_columns": len(columns),
         "model_scores": scores,
         "weights": weights,
@@ -96,7 +111,7 @@ def run(tune_trials: int = 40, skip_test: bool = False) -> dict:
         print("skip_test=True — stopping before prediction.")
         return summary
 
-    drift = _predict_and_write(families, columns, weights, tuned, X=X, y=y)
+    drift = _predict_and_write(all_families, columns, weights, tuned, X=X, y=y)
     summary.update(drift)
     SUMMARY_PATH.write_text(json.dumps(summary, indent=2, default=float))
     return summary
