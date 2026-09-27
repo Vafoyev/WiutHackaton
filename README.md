@@ -7,7 +7,7 @@ Estimate the probability that an AML alert is escalated. Metric: ROC-AUC.
 | Deliverable | Where |
 | --- | --- |
 | Prediction CSV | [`outputs/team_2ABB3C78.csv`](outputs/team_2ABB3C78.csv) |
-| EDA website | [`docs/`](docs/) — published with GitHub Pages |
+| EDA website | **https://boos.uz/aml/** — built from [`eda-website/`](eda-website/) into [`docs/`](docs/) |
 | Reproducible notebook | [`notebooks/final_solution.ipynb`](notebooks/final_solution.ipynb) |
 
 **Cross-validated ROC-AUC 0.63757 ± 0.00086**, on 25 selected
@@ -40,11 +40,16 @@ committed.
 > python -c "import pyarrow.parquet as pq; print(pq.ParquetFile('fintech_data/test_transactions.parquet').metadata.num_rows)"
 > ```
 
-The website is built separately:
+The website is built and published separately:
 
 ```bash
 cd eda-website && npm install && npm run build   # writes ../docs
+tools/deploy.sh                                  # publishes to https://boos.uz/aml/
 ```
+
+It is static — 26 MB of files, no server-side compute — so it is dropped inside
+an existing nginx document root rather than given its own server block; nothing
+in `/etc/nginx` is modified.
 
 ---
 
