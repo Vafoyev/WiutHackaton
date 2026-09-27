@@ -1061,14 +1061,14 @@ function App() {
           </button>
         ))}
       </div>
-      
+      <HeroSection />
       {/* --- SCROLL-BOUND VIDEO SEQUENCE --- */}
       <CanvasSequence 
         texts={[t.seq1, t.seq2, t.seq3, t.seq4]}
         frameCount={240} 
         getFrameUrl={(index: number) => `${import.meta.env.BASE_URL}video-frames/frame_${index}.webp`} 
       />
-      
+      <EdaSection />
     </LanguageContext.Provider>
   );
 }
