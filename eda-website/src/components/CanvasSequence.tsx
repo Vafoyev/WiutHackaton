@@ -134,7 +134,7 @@ export const CanvasSequence: React.FC<CanvasSequenceProps> = ({ frameCount, text
       {texts.map((text, i) => (
         <div 
           key={i}
-          ref={el => textRefs.current[i] = el}
+          ref={el => { textRefs.current[i] = el; }}
           className="absolute z-10 p-6 md:p-8 max-w-2xl bg-black/40 backdrop-blur-md rounded-2xl border border-[#22f396]/30 shadow-[0_0_40px_rgba(34,243,150,0.1)] text-center transform translate-y-10 opacity-0"
         >
           <h2 className="text-xl md:text-3xl font-hud tracking-wide text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] glow-text">

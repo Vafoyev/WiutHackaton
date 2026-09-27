@@ -1009,6 +1009,7 @@ function EdaSection() {
 
 function App() {
   const [lang, setLang] = useState('ru');
+  const t = translations[lang as keyof typeof translations];
   return (
     <LanguageContext.Provider value={lang}>
       <div className="fixed top-4 right-4 z-50 flex gap-2">
