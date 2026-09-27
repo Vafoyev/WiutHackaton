@@ -1,6 +1,11 @@
 import { CanvasSequence } from './components/CanvasSequence';
 import { useEffect, useRef, useState, createContext, useContext } from 'react';
+import Lenis from 'lenis';
+import gsap from 'gsap';
+import ScrollTrigger from 'gsap/ScrollTrigger';
 import './index.css';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const translations = {
   ru: {
@@ -1022,6 +1027,27 @@ function EdaSection() {
 function App() {
   const [lang, setLang] = useState('ru');
   const t = translations[lang as keyof typeof translations];
+
+  useEffect(() => {
+    const lenis = new Lenis({
+      smoothWheel: true,
+      duration: 1.2,
+    });
+
+    lenis.on('scroll', ScrollTrigger.update);
+
+    gsap.ticker.add((time) => {
+      lenis.raf(time * 1000);
+    });
+
+    gsap.ticker.lagSmoothing(0);
+
+    return () => {
+      lenis.destroy();
+      gsap.ticker.remove(lenis.raf);
+    };
+  }, []);
+
   return (
     <LanguageContext.Provider value={lang}>
       <div className="fixed top-4 right-4 z-50 flex gap-2">
