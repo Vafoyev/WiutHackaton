@@ -39,15 +39,45 @@ export const CanvasSequence: React.FC<CanvasSequenceProps> = ({ frameCount, text
     resizeCanvas();
 
     const images: HTMLImageElement[] = [];
+    const loaded: boolean[] = new Array(frameCount).fill(false);
     const airpods = { frame: 0 };
 
-    for (let i = 0; i < frameCount; i++) {
+    // The sequence is 240 frames / ~17.5 MB. Requesting them all at mount
+    // saturates the connection and delays everything else on the page, so the
+    // opening frames load at normal priority and the rest stream in behind
+    // them.
+    const EAGER_FRAMES = 24;
+    const BATCH = 8;
+    const BATCH_DELAY_MS = 120;
+    let streamTimer: number | undefined;
+
+    function loadFrame(index: number, priority: 'high' | 'low') {
       const img = new Image();
-      img.src = getFrameUrl(i + 1);
-      images.push(img);
+      // fetchPriority is not in every lib.dom yet; harmless where unsupported.
+      (img as HTMLImageElement & { fetchPriority?: string }).fetchPriority = priority;
+      img.decoding = 'async';
+      img.onload = () => {
+        loaded[index] = true;
+        if (index === 0) render();
+      };
+      img.src = getFrameUrl(index + 1);
+      images[index] = img;
     }
 
-    images[0].onload = render;
+    for (let i = 0; i < Math.min(EAGER_FRAMES, frameCount); i++) {
+      loadFrame(i, 'high');
+    }
+
+    let nextFrame = Math.min(EAGER_FRAMES, frameCount);
+    function streamRemaining() {
+      for (let n = 0; n < BATCH && nextFrame < frameCount; n++, nextFrame++) {
+        loadFrame(nextFrame, 'low');
+      }
+      if (nextFrame < frameCount) {
+        streamTimer = window.setTimeout(streamRemaining, BATCH_DELAY_MS);
+      }
+    }
+    streamTimer = window.setTimeout(streamRemaining, 400);
 
     function render() {
       if (!canvas || !ctx) return;
@@ -57,7 +87,15 @@ export const CanvasSequence: React.FC<CanvasSequenceProps> = ({ frameCount, text
       ctx.clearRect(0, 0, logicalWidth, logicalHeight);
       
       const frameIndex = Math.round(airpods.frame);
-      const img = images[frameIndex];
+      let img = images[frameIndex];
+      if (!loaded[frameIndex]) {
+        // Scrolling can outrun the stream; show the nearest decoded frame
+        // rather than blanking the canvas.
+        for (let d = 1; d < frameCount; d++) {
+          if (loaded[frameIndex - d]) { img = images[frameIndex - d]; break; }
+          if (loaded[frameIndex + d]) { img = images[frameIndex + d]; break; }
+        }
+      }
       if (img && img.complete) {
         const scale = Math.max(logicalWidth / img.width, logicalHeight / img.height);
         const x = (logicalWidth / 2) - (img.width / 2) * scale;
@@ -122,6 +160,7 @@ export const CanvasSequence: React.FC<CanvasSequenceProps> = ({ frameCount, text
     }
 
     return () => {
+      if (streamTimer !== undefined) window.clearTimeout(streamTimer);
       window.removeEventListener('resize', handleResize);
       tl.kill();
       ScrollTrigger.getAll().forEach((t) => t.kill());
