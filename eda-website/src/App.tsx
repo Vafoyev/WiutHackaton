@@ -1,5 +1,133 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState, createContext, useContext } from 'react';
 import './index.css';
+
+const translations = {
+  ru: {
+    heroTitle1: "Океан шума.",
+    heroTitle2: "Идеальный сигнал.",
+    heroDesc: "Мы построили систему приоритизации AML-алертов, основанную на строгой математике, доказательном отборе признаков и защите от переобучения.",
+    trainingAlerts: "Тренировочных алертов",
+    transactions: "Транзакций",
+    selectedFeatures: "Отобранных признаков",
+    cvRocAuc: "CV ROC-AUC",
+    edaTitle: "В поисках паттернов: Разведочный анализ (EDA)",
+    timeActivity: "Активность во времени",
+    timeActivityDesc1: "Динамика транзакций в окне 30 дней до генерации алерта.",
+    timeActivityDesc2: "Заметно резкое увеличение объема операций за несколько дней до фиксации подозрительной активности системой.",
+    daysToAlert: "Дни до срабатывания",
+    transactionTypes: "Категории транзакций",
+    transactionTypesDesc1: "Сводная статистика по основным категориям денежных переводов в исторической выборке.",
+    transactionTypesDesc2: "Значительная часть объема приходится на корпоративные и обычные переводы, что характерно для банковского сектора.",
+    patternBurst: "Паттерн: Всплеск активности",
+    patternBurstDesc: 'Ключевой поведенческий паттерн "Escalated" алертов: аномальная концентрация крупных сумм (burst) в узком временном окне перед срабатыванием.',
+    timeLabel: "Время",
+    amountIqr: "Сумма (IQR)",
+    typesByOutcome: "Типы транзакций в зависимости от исхода",
+    typesByOutcomeDesc1: "Распределение типов транзакций (Karta, Bank Otkazmasi, Naqd, Xalqaro) и их направлений (Kirim/Chiqim) в разрезе исхода алертов.",
+    typesByOutcomeDesc2: "На графике видно, что эскалированные случаи имеют аномальное распределение по типам переводов по сравнению с ложными срабатываниями.",
+    targetDistTitle: "Распределение таргета (Target Distribution)",
+    targetDistDesc: "Большинство алертов закрываются (Dismissed). Доля эскалированных (Escalated) составляет {rate}. Анализ распределения целевой переменной показывает сильный дисбаланс классов, что потребовало применения стратифицированной кросс-валидации (Stratified K-Fold) при обучении ансамбля.",
+    ablationTitle: "Больше данных ≠ Лучше. Отсечение шума.",
+    ablationDesc: "Мы измерили семейства признаков строгой кросс-валидацией. Точность достигла пика на компактном наборе. Добавление остальных только снижало ROC-AUC. Из отвергнутых: {rejected}, из них на уровне случайности: {chance}. Drift: {drift} (Adversarial AUC {adv}).",
+    familyAdded: "Family added",
+    columns: "Columns",
+    decision: "Decision",
+    conclusionTitle: "Заключение и основные выводы",
+    conclusion1: "В ходе разведочного анализа данных мы выявили, что базовые признаки (тип и направление транзакций) несут наиболее сильный сигнал, в то время как временные \"окна\" (windows) и сложные агрегации создают много шума и ведут к переобучению на исторических данных.",
+    conclusion2: "Эскалированные алерты характеризуются резким всплеском специфических транзакций в дни, непосредственно предшествующие срабатыванию системы. На основе этих инсайтов мы провели строгий отбор признаков, отсекли шумовые переменные и построили робастный ансамбль моделей. Это позволило нам не только повысить ROC-AUC на кросс-валидации, но и гарантировать устойчивость модели на скрытой тестовой выборке.",
+    teamInfo: "Команда DnkCode",
+    langSelector: "Ru",
+    kept: "kept",
+    rejected: "rejected",
+    total: "Total",
+    escalated: "Escalated",
+    dismissed: "Dismissed"
+  },
+  en: {
+    heroTitle1: "An Ocean of Noise.",
+    heroTitle2: "The Perfect Signal.",
+    heroDesc: "We built an AML alert prioritization system based on rigorous mathematics, evidence-based feature selection, and overfitting protection.",
+    trainingAlerts: "Training alerts",
+    transactions: "Transactions",
+    selectedFeatures: "Selected features",
+    cvRocAuc: "CV ROC-AUC",
+    edaTitle: "In Search of Patterns: Exploratory Data Analysis (EDA)",
+    timeActivity: "Activity Over Time",
+    timeActivityDesc1: "Transaction dynamics in a 30-day window before alert generation.",
+    timeActivityDesc2: "A sharp increase in transaction volume is noticeable a few days before suspicious activity is flagged.",
+    daysToAlert: "Days to alert",
+    transactionTypes: "Transaction Categories",
+    transactionTypesDesc1: "Summary statistics on the main categories of money transfers in the historical sample.",
+    transactionTypesDesc2: "A significant portion of the volume comes from corporate and regular transfers, typical for the banking sector.",
+    patternBurst: "Pattern: Activity Burst",
+    patternBurstDesc: 'Key behavioral pattern for "Escalated" alerts: anomalous concentration of large amounts (burst) in a narrow time window before triggering.',
+    timeLabel: "Time",
+    amountIqr: "Amount (IQR)",
+    typesByOutcome: "Transaction Types by Outcome",
+    typesByOutcomeDesc1: "Distribution of transaction types (Karta, Bank Otkazmasi, Naqd, Xalqaro) and directions (Kirim/Chiqim) by alert outcome.",
+    typesByOutcomeDesc2: "The chart shows escalated cases have an anomalous distribution of transfer types compared to false positives.",
+    targetDistTitle: "Target Distribution",
+    targetDistDesc: "Most alerts are dismissed. The escalated rate is {rate}. Target variable analysis shows strong class imbalance, which required using Stratified K-Fold cross-validation when training the ensemble.",
+    ablationTitle: "More Data ≠ Better. Noise Reduction.",
+    ablationDesc: "We evaluated feature families using rigorous cross-validation. Accuracy peaked on a compact set. Adding the rest only lowered ROC-AUC. Rejected: {rejected}, at random level: {chance}. Drift: {drift} (Adversarial AUC {adv}).",
+    familyAdded: "Family added",
+    columns: "Columns",
+    decision: "Decision",
+    conclusionTitle: "Conclusion and Key Takeaways",
+    conclusion1: "During EDA, we found that basic features (transaction type and direction) carry the strongest signal, while time windows and complex aggregations create noise and lead to overfitting on historical data.",
+    conclusion2: "Escalated alerts are characterized by a sharp burst of specific transactions in the days immediately preceding the system trigger. Based on these insights, we conducted strict feature selection and built a robust ensemble of models, guaranteeing stability on the hidden test set.",
+    teamInfo: "Team DnkCode",
+    langSelector: "En",
+    kept: "kept",
+    rejected: "rejected",
+    total: "Total",
+    escalated: "Escalated",
+    dismissed: "Dismissed"
+  },
+  uz: {
+    heroTitle1: "Shovqin ummoni.",
+    heroTitle2: "Mukammal signal.",
+    heroDesc: "Biz qat'iy matematika, isbotlangan belgilar tanlovi va haddan tashqari moslashishdan himoyalanishga asoslangan AML signallarini ustuvorlashtirish tizimini qurdik.",
+    trainingAlerts: "O'quv signallari",
+    transactions: "Tranzaksiyalar",
+    selectedFeatures: "Tanlangan belgilar",
+    cvRocAuc: "CV ROC-AUC",
+    edaTitle: "Naqshlarni qidirishda: Qidiruv ma'lumotlarini tahlil qilish (EDA)",
+    timeActivity: "Vaqt o'tishi bilan faollik",
+    timeActivityDesc1: "Signal yaratilishidan oldin 30 kunlik darchadagi tranzaksiya dinamikasi.",
+    timeActivityDesc2: "Tizim shubhali faollikni qayd etishidan bir necha kun oldin operatsiyalar hajmining keskin oshishi seziladi.",
+    daysToAlert: "Signalga qolgan kunlar",
+    transactionTypes: "Tranzaksiya Toifalari",
+    transactionTypesDesc1: "Tarixiy namunadagi pul o'tkazmalarining asosiy toifalari bo'yicha yig'ma statistika.",
+    transactionTypesDesc2: "Hajmning katta qismi bank sektori uchun xos bo'lgan korporativ va oddiy o'tkazmalarga to'g'ri keladi.",
+    patternBurst: "Naqsh: Faollik portlashi",
+    patternBurstDesc: 'Eskalatsiya qilingan signallarning asosiy xulq-atvor naqshi: tetiklanishdan oldin tor vaqt darchasida katta miqdorlarning (burst) g\'ayritabiiy to\'planishi.',
+    timeLabel: "Vaqt",
+    amountIqr: "Miqdor (IQR)",
+    typesByOutcome: "Natijaga ko'ra tranzaksiya turlari",
+    typesByOutcomeDesc1: "Signal natijasi bo'yicha tranzaksiya turlari (Karta, Bank Otkazmasi, Naqd, Xalqaro) va yo'nalishlari (Kirim/Chiqim) taqsimoti.",
+    typesByOutcomeDesc2: "Grafik shuni ko'rsatadiki, eskalatsiya qilingan holatlar yolg'on ijobiy natijalarga nisbatan o'tkazma turlari bo'yicha g'ayritabiiy taqsimotga ega.",
+    targetDistTitle: "Target Taqsimoti",
+    targetDistDesc: "Aksariyat signallar yopiladi (Dismissed). Eskalatsiya qilinganlar ulushi {rate}. Maqsadli o'zgaruvchining tahlili kuchli sinf nomutanosibligini ko'rsatadi, bu esa ansamblni o'qitishda tabaqalashtirilgan (Stratified K-Fold) usulni talab qildi.",
+    ablationTitle: "Ko'proq Ma'lumot ≠ Yaxshiroq. Shovqinni kamaytirish.",
+    ablationDesc: "Biz belgi oilalarini qat'iy kesish-tekshirish yordamida o'lchadik. Aniqlik ixcham to'plamda eng yuqori darajaga yetdi. Qolganlarini qo'shish faqat ROC-AUCni pasaytirdi. Rad etildi: {rejected}, tasodif darajasida: {chance}. Drift: {drift} (Adversarial AUC {adv}).",
+    familyAdded: "Family added",
+    columns: "Columns",
+    decision: "Decision",
+    conclusionTitle: "Xulosa va asosiy natijalar",
+    conclusion1: "Qidiruv ma'lumotlarini tahlil qilish davomida biz asosiy belgilar (tranzaksiya turi va yo'nalishi) eng kuchli signalni berishini, vaqt darchalari va murakkab yig'ishlar esa shovqin yaratib, haddan tashqari moslashishga olib kelishini aniqladik.",
+    conclusion2: "Eskalatsiya qilingan signallar tizim tetiklanishidan darhol oldin ma'lum tranzaksiyalarning keskin o'sishi bilan tavsiflanadi. Ushbu tushunchalarga asoslanib, biz qat'iy xususiyatlarni tanlashni o'tkazdik va yashirin sinov to'plamida barqarorlikni kafolatlaydigan modellarning mustahkam ansamblini qurdik.",
+    teamInfo: "DnkCode Jamoasi",
+    langSelector: "Uz",
+    kept: "kept",
+    rejected: "rejected",
+    total: "Total",
+    escalated: "Escalated",
+    dismissed: "Dismissed"
+  }
+};
+
+const LanguageContext = createContext('ru');
 
 // --- Mock Data ---
 const data = {
@@ -41,6 +169,8 @@ const data = {
 };
 
 function HeroSection() {
+  const lang = useContext(LanguageContext);
+  const t = translations[lang as keyof typeof translations];
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -194,7 +324,7 @@ function HeroSection() {
       let i = 0;
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
-          const baseX = basePositions[i * 3];
+          // const baseX = basePositions[i * 3];
           const baseZ = basePositions[i * 3 + 2];
 
           const wave1 = Math.sin(c * 0.12 + time * 1.5) * 85;
@@ -284,7 +414,7 @@ function HeroSection() {
         </div>
         
         <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight leading-[1.08] mb-7">
-          <span className="block text-white">Океан шума.</span>
+          <span className="block text-white">{t.heroTitle1}</span>
           <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#22f396] via-[#0df2c9] to-[#22f396] neon-text-glow mt-1.5">
             Идеальный сигнал.
           </span>
@@ -307,6 +437,8 @@ function HeroSection() {
 }
 
 function EdaSection() {
+  const lang = useContext(LanguageContext);
+  const t = translations[lang as keyof typeof translations];
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -424,7 +556,7 @@ function EdaSection() {
                 <span className="font-hud text-3xl sm:text-4xl font-semibold text-white tracking-wider glow-text">{data.alerts}</span>
               </div>
             </div>
-            <p className="mt-4 text-[13px] sm:text-sm font-light text-slate-300/80 tracking-wide text-center">Тренировочных алертов</p>
+            <p className="mt-4 text-[13px] sm:text-sm font-light text-slate-300/80 tracking-wide text-center">{t.trainingAlerts}</p>
           </div>
 
           <div className="relative z-10 flex flex-col items-center flex-1 min-w-[200px] m-4">
@@ -443,7 +575,7 @@ function EdaSection() {
                 <span className="font-hud text-3xl sm:text-4xl font-semibold text-white tracking-wider glow-text">{data.transactions}</span>
               </div>
             </div>
-            <p className="mt-4 text-[13px] sm:text-sm font-light text-slate-300/80 tracking-wide text-center">Транзакций</p>
+            <p className="mt-4 text-[13px] sm:text-sm font-light text-slate-300/80 tracking-wide text-center">{t.transactions}</p>
           </div>
 
           <div className="relative z-10 flex flex-col items-center flex-1 min-w-[200px] m-4">
@@ -460,7 +592,7 @@ function EdaSection() {
                 <span className="font-hud text-3xl sm:text-4xl font-semibold text-white tracking-wider glow-text">{data.columns}</span>
               </div>
             </div>
-            <p className="mt-4 text-[13px] sm:text-sm font-light text-slate-300/80 tracking-wide text-center">Отобранных признаков</p>
+            <p className="mt-4 text-[13px] sm:text-sm font-light text-slate-300/80 tracking-wide text-center">{t.selectedFeatures}</p>
           </div>
 
           <div className="relative z-10 flex flex-col items-center flex-[1.4] min-w-[280px] m-4">
@@ -489,7 +621,7 @@ function EdaSection() {
                 <span className="font-hud text-5xl sm:text-6xl font-bold tracking-tight text-[#6ee7b7] glow-text">{data.auc}</span>
               </div>
             </div>
-            <p className="mt-2 text-sm sm:text-base font-medium text-slate-300 tracking-wider text-center">CV ROC-AUC</p>
+            <p className="mt-2 text-sm sm:text-base font-medium text-slate-300 tracking-wider text-center">{t.cvRocAuc}</p>
           </div>
         </section>
         <div className="relative z-10 w-full flex items-center justify-between text-[11px] text-slate-600 font-mono tracking-widest pt-2">
@@ -501,7 +633,7 @@ function EdaSection() {
       {/* --- ALL 5 ARTICLES FROM YOUR ORIGINAL DESIGN --- */}
       <section className="relative z-10 w-full max-w-[1400px] flex flex-col items-center px-4">
         <header className="w-full text-center mb-8 md:mb-12">
-          <h2 className="text-3xl md:text-4xl font-normal tracking-wide text-white drop-shadow-md">В поисках паттернов: Разведочный анализ (EDA)</h2>
+          <h2 className="text-3xl md:text-4xl font-normal tracking-wide text-white drop-shadow-md">{t.edaTitle}</h2>
         </header>
         <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-10">
           
@@ -539,8 +671,8 @@ function EdaSection() {
                     <text textAnchor="middle" x="230" y="235">Day -10</text>
                     <text textAnchor="middle" x="325" y="235">Day -5</text>
                     <text textAnchor="middle" x="410" y="235">Alert Date</text>
-                    <text fill="#cbd5e1" fontSize="11" textAnchor="middle" x="235" y="255">Дни до срабатывания</text>
-                    <text fill="#cbd5e1" fontSize="11" textAnchor="middle" transform="rotate(-90)" x="-110" y="12">Транзакции</text>
+                    <text fill="#cbd5e1" fontSize="11" textAnchor="middle" x="235" y="255">{t.daysToAlert}</text>
+                    <text fill="#cbd5e1" fontSize="11" textAnchor="middle" transform="rotate(-90)" x="-110" y="12">{t.transactions}</text>
                   </g>
                   <path className="glow-cyan" d="M 45,215 L 50,210 L 53,195 L 55,145 L 57,190 L 63,212 L 72,210 L 80,205 
                                          L 88,212 L 95,198 L 102,185 L 110,195 L 118,170 L 126,178 L 132,165 
@@ -554,7 +686,7 @@ function EdaSection() {
               </div>
             </div>
             <div className="md:col-span-5 glass-card rounded-2xl p-6 sm:p-7 flex flex-col justify-center">
-              <h2 className="text-white text-lg font-medium mb-4">Активность во времени</h2>
+              <h2 className="text-white text-lg font-medium mb-4">{t.timeActivity}</h2>
               <p className="text-slate-400 text-sm leading-relaxed mb-4">
                 Динамика транзакций в окне 30 дней до генерации алерта.
               </p>
@@ -612,7 +744,7 @@ function EdaSection() {
               </div>
             </div>
             <div className="md:col-span-5 glass-card rounded-2xl p-6 sm:p-7 flex flex-col justify-center">
-              <h2 className="text-white text-lg font-medium mb-4">Категории транзакций</h2>
+              <h2 className="text-white text-lg font-medium mb-4">{t.transactionTypes}</h2>
               <p className="text-slate-400 text-sm leading-relaxed mb-4">
                 Сводная статистика по основным категориям денежных переводов в исторической выборке.
               </p>
@@ -627,7 +759,7 @@ function EdaSection() {
             =========================================== */}
           <article className="grid grid-cols-1 md:grid-cols-12 gap-5 items-stretch" data-purpose="chart-card-group">
             <div className="md:col-span-5 order-2 md:order-1 glass-card rounded-2xl p-6 sm:p-7 flex flex-col justify-center">
-              <h2 className="text-white text-lg font-medium mb-4 leading-snug">Паттерн: Всплеск активности</h2>
+              <h2 className="text-white text-lg font-medium mb-4 leading-snug">{t.patternBurst}</h2>
               <p className="text-slate-400 text-sm leading-relaxed">
                 Ключевой поведенческий паттерн "Escalated" алертов: аномальная концентрация крупных сумм (burst) в узком временном окне перед срабатыванием.
               </p>
@@ -731,11 +863,11 @@ function EdaSection() {
 
                   <g fill="#94a3b8" fontFamily="sans-serif" fontSize="9">
                     <rect fill="#00f2fe" height="7" width="7" x="390" y="32"></rect>
-                    <text x="403" y="39">Total</text>
+                    <text x="403" y="39">{t.total}</text>
                     <rect fill="#22c55e" height="7" width="7" x="390" y="47"></rect>
-                    <text x="403" y="54">Escalated</text>
+                    <text x="403" y="54">{t.escalated}</text>
                     <rect fill="#a3e635" height="7" width="7" x="390" y="62"></rect>
-                    <text x="403" y="69">Dismissed</text>
+                    <text x="403" y="69">{t.dismissed}</text>
                   </g>
                   <g fill="#94a3b8" fontFamily="sans-serif" fontSize="9">
                     <text transform="rotate(30, 65, 215)" x="65" y="215">Kirim</text>
@@ -748,7 +880,7 @@ function EdaSection() {
               </div>
             </div>
             <div className="md:col-span-5 glass-card rounded-2xl p-6 sm:p-7 flex flex-col justify-center">
-              <h2 className="text-white text-lg font-medium mb-4 leading-snug">Типы транзакций в зависимости от исхода</h2>
+              <h2 className="text-white text-lg font-medium mb-4 leading-snug">{t.typesByOutcome}</h2>
               <p className="text-slate-400 text-sm leading-relaxed mb-4">
                 Распределение типов транзакций (Karta, Bank Otkazmasi, Naqd, Xalqaro) и их направлений (Kirim/Chiqim) в разрезе исхода алертов. 
               </p>
@@ -768,7 +900,7 @@ function EdaSection() {
               </div>
             </div>
             <div className="md:col-span-6 glass-card rounded-2xl p-6 sm:p-7 flex flex-col justify-center">
-              <h2 className="text-white text-lg font-medium mb-4 leading-snug">Распределение таргета (Target Distribution)</h2>
+              <h2 className="text-white text-lg font-medium mb-4 leading-snug">{t.targetDistTitle}</h2>
               <p className="text-slate-400 text-sm leading-relaxed mb-4">
                 Большинство алертов закрываются (Dismissed). Доля эскалированных (Escalated) составляет {data.rate}. 
                 Анализ распределения целевой переменной показывает сильный дисбаланс классов, что потребовало применения стратифицированной кросс-валидации (Stratified K-Fold) при обучении ансамбля.
@@ -784,11 +916,11 @@ function EdaSection() {
         <div aria-hidden="true" className="prism-facets"></div>
 
         <header className="relative z-10 flex flex-col items-center w-full">
-          <h2 className="text-[32px] sm:text-[34px] font-normal tracking-wide text-white text-center mb-5">Больше данных ≠ Лучше. Отсечение шума.</h2>
+          <h2 className="text-[32px] sm:text-[34px] font-normal tracking-wide text-white text-center mb-5">{t.ablationTitle}</h2>
           <aside className="w-full max-w-[850px] bg-[#0e161c]/80 backdrop-blur-md border border-[#4ade80]/90 rounded-xl px-5 py-3 shadow-[0_0_15px_rgba(74,222,128,0.15)] flex items-start gap-3.5">
             <span aria-hidden="true" className="text-[#4ade80] text-2xl font-serif font-black leading-none mt-0.5 select-none">“</span>
             <p className="text-[13.5px] leading-[1.4] text-slate-200 font-normal">
-              Мы измерили семейства признаков строгой кросс-валидацией. Точность достигла пика на компактном наборе. Добавление остальных только снижало ROC-AUC. Из отвергнутых: {data.rejected_families}, из них на уровне случайности: {data.chance_families}. Drift: {data.drift_verdict} (Adversarial AUC {data.adversarial}).
+              {t.ablationDesc.replace('{rejected}', data.rejected_families.toString()).replace('{chance}', data.chance_families.toString()).replace('{drift}', data.drift_verdict).replace('{adv}', data.adversarial.toString())}
             </p>
           </aside>
         </header>
@@ -798,12 +930,12 @@ function EdaSection() {
             <table className="w-full text-left text-sm border-collapse">
               <thead>
                 <tr className="table-row-border text-slate-300 font-medium text-[13px]">
-                  <th className="pb-2.5 pl-4 font-normal text-slate-300 w-[44%]" scope="col">Family added</th>
-                  <th className="pb-2.5 text-center font-normal text-slate-300 w-[16%]" scope="col">Columns</th>
+                  <th className="pb-2.5 pl-4 font-normal text-slate-300 w-[44%]" scope="col">{t.familyAdded}</th>
+                  <th className="pb-2.5 text-center font-normal text-slate-300 w-[16%]" scope="col">{t.columns}</th>
                   <th className="pb-2.5 text-center font-normal text-slate-300 w-[20%]" scope="col">
                     <span className="inline-flex items-center gap-2"><span className="text-white/20 text-xs">|</span> CV mean <span className="text-white/20 text-xs">|</span></span>
                   </th>
-                  <th className="pb-2.5 pr-4 text-center font-normal text-slate-300 w-[20%]" scope="col">Decision</th>
+                  <th className="pb-2.5 pr-4 text-center font-normal text-slate-300 w-[20%]" scope="col">{t.decision}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/[0.06] text-[13px] font-normal tracking-tight text-slate-300">
@@ -818,7 +950,7 @@ function EdaSection() {
                           ? "bg-[#34d399] text-[#042f1a] shadow-[0_0_10px_rgba(52,211,153,0.35)]" 
                           : "bg-[#ef4444] text-white shadow-[0_0_8px_rgba(239,68,68,0.35)]"
                       }`}>
-                        {row.accepted ? "kept" : "rejected"}
+                        {row.accepted ? t.kept : t.rejected}
                       </span>
                     </td>
                   </tr>
@@ -854,7 +986,7 @@ function EdaSection() {
             <span className="font-mono text-cyan-400 font-bold">D</span>
           </div>
           <div>
-            <h3 className="text-white font-medium text-lg tracking-wide">Команда DnkCode</h3>
+            <h3 className="text-white font-medium text-lg tracking-wide">{t.teamInfo}</h3>
             <p className="text-cyan-500/70 text-xs font-mono tracking-widest uppercase">ID: 2ABB3C78</p>
           </div>
         </div>
@@ -868,12 +1000,25 @@ function EdaSection() {
 }
 
 function App() {
+  const [lang, setLang] = useState('ru');
   return (
-    <>
+    <LanguageContext.Provider value={lang}>
+      <div className="fixed top-4 right-4 z-50 flex gap-2">
+        {['ru', 'en', 'uz'].map((l) => (
+          <button 
+            key={l}
+            onClick={() => setLang(l)}
+            className={"px-3 py-1 text-xs font-mono uppercase rounded border transition-colors " + (lang === l ? "bg-[#22f396]/20 border-[#22f396] text-[#22f396]" : "bg-black/50 border-cyan-900/50 text-slate-400 hover:border-[#22f396]/50")}
+          >
+            {l}
+          </button>
+        ))}
+      </div>
       <HeroSection />
       <EdaSection />
-    </>
+    </LanguageContext.Provider>
   );
 }
+
 
 export default App;
