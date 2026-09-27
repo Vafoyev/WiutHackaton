@@ -534,13 +534,13 @@ function EdaSection() {
                     <text textAnchor="end" x="40" y="159">400</text>
                     <text textAnchor="end" x="40" y="204">200</text>
                     <text textAnchor="end" x="40" y="222">0</text>
-                    <text fill="#64748b" fontSize="9" textAnchor="middle" x="45" y="235">Jan 2022</text>
-                    <text textAnchor="middle" x="135" y="235">2005</text>
-                    <text textAnchor="middle" x="230" y="235">2010</text>
-                    <text textAnchor="middle" x="325" y="235">2015</text>
-                    <text textAnchor="middle" x="410" y="235">2020</text>
-                    <text fill="#cbd5e1" fontSize="11" textAnchor="middle" x="235" y="255">Дата</text>
-                    <text fill="#cbd5e1" fontSize="11" textAnchor="middle" transform="rotate(-90)" x="-110" y="12">Активность</text>
+                    <text fill="#64748b" fontSize="9" textAnchor="middle" x="45" y="235">Day -30</text>
+                    <text textAnchor="middle" x="135" y="235">Day -20</text>
+                    <text textAnchor="middle" x="230" y="235">Day -10</text>
+                    <text textAnchor="middle" x="325" y="235">Day -5</text>
+                    <text textAnchor="middle" x="410" y="235">Alert Date</text>
+                    <text fill="#cbd5e1" fontSize="11" textAnchor="middle" x="235" y="255">Дни до срабатывания</text>
+                    <text fill="#cbd5e1" fontSize="11" textAnchor="middle" transform="rotate(-90)" x="-110" y="12">Транзакции</text>
                   </g>
                   <path className="glow-cyan" d="M 45,215 L 50,210 L 53,195 L 55,145 L 57,190 L 63,212 L 72,210 L 80,205 
                                          L 88,212 L 95,198 L 102,185 L 110,195 L 118,170 L 126,178 L 132,165 
@@ -556,10 +556,10 @@ function EdaSection() {
             <div className="md:col-span-5 glass-card rounded-2xl p-6 sm:p-7 flex flex-col justify-center">
               <h2 className="text-white text-lg font-medium mb-4">Активность во времени</h2>
               <p className="text-slate-400 text-sm leading-relaxed mb-4">
-                Активность во времени от направления и типы транзакций.
+                Динамика транзакций в окне 30 дней до генерации алерта.
               </p>
               <p className="text-slate-400 text-sm leading-relaxed">
-                Активность во времени активнает проялоноемость, которая активность во времени.
+                Заметно резкое увеличение объема операций за несколько дней до фиксации подозрительной активности системой.
               </p>
             </div>
           </article>
@@ -599,25 +599,25 @@ function EdaSection() {
                   <rect className="glow-lime" fill="#a3e635" fillOpacity="0.08" height="38" rx="3" stroke="#a3e635" strokeWidth="2.5" width="28" x="340" y="178"></rect>
                   <rect className="glow-lime" fill="#a3e635" fillOpacity="0.08" height="32" rx="3" stroke="#a3e635" strokeWidth="2.5" width="28" x="387" y="184"></rect>
                   <g fill="#94a3b8" fontFamily="sans-serif" fontSize="9">
-                    <text transform="rotate(30, 70, 226)" x="70" y="226">Иолочны</text>
-                    <text transform="rotate(30, 117, 226)" x="117" y="226">Правалсниа</text>
-                    <text transform="rotate(30, 164, 226)" x="164" y="226">Йол</text>
-                    <text transform="rotate(30, 211, 226)" x="211" y="226">Олонок</text>
-                    <text transform="rotate(30, 258, 226)" x="258" y="226">Навот</text>
-                    <text transform="rotate(30, 305, 226)" x="305" y="226">Леликюокне</text>
-                    <text transform="rotate(30, 352, 226)" x="352" y="226">Промкдание</text>
-                    <text transform="rotate(30, 399, 226)" x="399" y="226">Назани</text>
+                    <text transform="rotate(30, 70, 226)" x="70" y="226">Обычная</text>
+                    <text transform="rotate(30, 117, 226)" x="117" y="226">Корпоративная</text>
+                    <text transform="rotate(30, 164, 226)" x="164" y="226">Перевод</text>
+                    <text transform="rotate(30, 211, 226)" x="211" y="226">Кредит</text>
+                    <text transform="rotate(30, 258, 226)" x="258" y="226">Депозит</text>
+                    <text transform="rotate(30, 305, 226)" x="305" y="226">Снятие</text>
+                    <text transform="rotate(30, 352, 226)" x="352" y="226">Пополнение</text>
+                    <text transform="rotate(30, 399, 226)" x="399" y="226">Международная</text>
                   </g>
                 </svg>
               </div>
             </div>
             <div className="md:col-span-5 glass-card rounded-2xl p-6 sm:p-7 flex flex-col justify-center">
-              <h2 className="text-white text-lg font-medium mb-4">Направления и типы транзакций</h2>
+              <h2 className="text-white text-lg font-medium mb-4">Категории транзакций</h2>
               <p className="text-slate-400 text-sm leading-relaxed mb-4">
-                Направления и транзакций транзакций направления и типы транзакций.
+                Сводная статистика по основным категориям денежных переводов в исторической выборке.
               </p>
               <p className="text-slate-400 text-sm leading-relaxed">
-                Пслеск транзакций в зависимости от исхода направления и типы транзакций.
+                Значительная часть объема приходится на корпоративные и обычные переводы, что характерно для банковского сектора.
               </p>
             </div>
           </article>
@@ -627,9 +627,9 @@ function EdaSection() {
             =========================================== */}
           <article className="grid grid-cols-1 md:grid-cols-12 gap-5 items-stretch" data-purpose="chart-card-group">
             <div className="md:col-span-5 order-2 md:order-1 glass-card rounded-2xl p-6 sm:p-7 flex flex-col justify-center">
-              <h2 className="text-white text-lg font-medium mb-4 leading-snug">Всплеск активности перед алертом</h2>
+              <h2 className="text-white text-lg font-medium mb-4 leading-snug">Паттерн: Всплеск активности</h2>
               <p className="text-slate-400 text-sm leading-relaxed">
-                Всплеск активности перед транзакции Всплеск активности перед алертом пеперхажнаго яныси незнеполсмени.
+                Ключевой поведенческий паттерн "Escalated" алертов: аномальная концентрация крупных сумм (burst) в узком временном окне перед срабатыванием.
               </p>
             </div>
             <div className="md:col-span-7 order-1 md:order-2 flex flex-col justify-end pt-4 pr-2">
@@ -731,18 +731,18 @@ function EdaSection() {
 
                   <g fill="#94a3b8" fontFamily="sans-serif" fontSize="9">
                     <rect fill="#00f2fe" height="7" width="7" x="390" y="32"></rect>
-                    <text x="403" y="39">Исхода</text>
+                    <text x="403" y="39">Total</text>
                     <rect fill="#22c55e" height="7" width="7" x="390" y="47"></rect>
-                    <text x="403" y="54">Нелети</text>
+                    <text x="403" y="54">Escalated</text>
                     <rect fill="#a3e635" height="7" width="7" x="390" y="62"></rect>
-                    <text x="403" y="69">Не исхода</text>
+                    <text x="403" y="69">Dismissed</text>
                   </g>
                   <g fill="#94a3b8" fontFamily="sans-serif" fontSize="9">
-                    <text transform="rotate(30, 65, 215)" x="65" y="215">Направлейка</text>
-                    <text transform="rotate(30, 127, 215)" x="127" y="215">Транзакции</text>
-                    <text transform="rotate(30, 190, 215)" x="190" y="215">Ворвтронакций</text>
-                    <text transform="rotate(30, 252, 215)" x="252" y="215">Озппловнит</text>
-                    <text transform="rotate(30, 306, 215)" x="306" y="215">Типы транзакций</text>
+                    <text transform="rotate(30, 65, 215)" x="65" y="215">Kirim</text>
+                    <text transform="rotate(30, 127, 215)" x="127" y="215">Chiqim</text>
+                    <text transform="rotate(30, 190, 215)" x="190" y="215">Karta</text>
+                    <text transform="rotate(30, 252, 215)" x="252" y="215">Bank Otkazmasi</text>
+                    <text transform="rotate(30, 306, 215)" x="306" y="215">Naqd / Xalqaro</text>
                   </g>
                 </svg>
               </div>
@@ -750,10 +750,10 @@ function EdaSection() {
             <div className="md:col-span-5 glass-card rounded-2xl p-6 sm:p-7 flex flex-col justify-center">
               <h2 className="text-white text-lg font-medium mb-4 leading-snug">Типы транзакций в зависимости от исхода</h2>
               <p className="text-slate-400 text-sm leading-relaxed mb-4">
-                Типы транзакций в зависимости от исхода недрижатет Типы транзакций в пролучения воспоостались оклзчение признаковои от исхода.
+                Распределение типов транзакций (Karta, Bank Otkazmasi, Naqd, Xalqaro) и их направлений (Kirim/Chiqim) в разрезе исхода алертов. 
               </p>
               <p className="text-slate-400 text-sm leading-relaxed">
-                Вотроврженных имвости ноплов.
+                На графике видно, что эскалированные случаи имеют аномальное распределение по типам переводов по сравнению с ложными срабатываниями.
               </p>
             </div>
           </article>
