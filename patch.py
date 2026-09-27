@@ -1,107 +1,28 @@
-"""Render the EDA website as static HTML with pre-rendered charts."""
-import base64
-import io
-import json
+import re
 from pathlib import Path
 
-import matplotlib
+# Path to the build_site.py script
+target_path = Path(r"c:\Users\isobe\Desktop\WiutHackaton-1\src\build_site.py")
 
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-plt.style.use("dark_background")
-import pandas as pd
+# Read current content
+content = target_path.read_text(encoding="utf-8")
 
-from src import config
-from src.data import load_signals, load_transactions
-from src.features import prepare_transactions
-from src.site_data import compute
+# 1. Inject plt.style.use("dark_background") right after import matplotlib.pyplot as plt
+content = content.replace('import matplotlib.pyplot as plt', 'import matplotlib.pyplot as plt\nplt.style.use("dark_background")')
 
-PALETTE = {"Dismissed": "#4a8f79", "Escalated": "#d36a52"}
+# 2. Make savefig transparent so the charts fit seamlessly into the dark glass cards
+content = content.replace('fig.savefig(buffer, format="png", dpi=120, bbox_inches="tight")', 
+                          'fig.savefig(buffer, format="png", dpi=120, bbox_inches="tight", transparent=True)')
 
+# 3. Replace ablation_rows generation to match the Tailwind design from Slide 2
+old_ablation = """    ablation_rows = "".join(
+        f"<tr><td>{row['family']}</td><td>{row['n_columns']}</td>"
+        f"<td>{row['mean']:.5f}</td><td>{row['std']:.5f}</td>"
+        f"<td>{'kept' if row['accepted'] else 'rejected'}</td></tr>"
+        for row in summary.get("selection_history", [])
+    )"""
 
-def _figure_to_data_uri(fig) -> str:
-    buffer = io.BytesIO()
-    fig.savefig(buffer, format="png", dpi=120, bbox_inches="tight", transparent=True)
-    plt.close(fig)
-    encoded = base64.b64encode(buffer.getvalue()).decode("ascii")
-    return f"data:image/png;base64,{encoded}"
-
-
-def _charts(tables: dict[str, pd.DataFrame]) -> dict[str, str]:
-    charts: dict[str, str] = {}
-
-    fig, ax = plt.subplots(figsize=(6, 3.5))
-    fig.patch.set_alpha(0.0)
-    ax.patch.set_alpha(0.0)
-    target = tables["target"]
-    ax.bar(target["outcome"], target["alerts"], color=[PALETTE[o] for o in target["outcome"]])
-    ax.set_ylabel("Alerts")
-    ax.set_title("Target distribution")
-    charts["target"] = _figure_to_data_uri(fig)
-
-    fig, ax = plt.subplots(figsize=(10, 3.5))
-    fig.patch.set_alpha(0.0)
-    ax.patch.set_alpha(0.0)
-    weekly = tables["weekly_volume"]
-    ax.plot(weekly["tranzaksiya_vaqti"], weekly["transactions"], color="#3f6f8f")
-    ax.set_ylabel("Transactions")
-    ax.set_title("Weekly transaction volume")
-    charts["weekly"] = _figure_to_data_uri(fig)
-
-    fig, axes = plt.subplots(1, 2, figsize=(10, 3.5))
-    fig.patch.set_alpha(0.0)
-    axes[0].patch.set_alpha(0.0)
-    axes[1].patch.set_alpha(0.0)
-    direction = tables["direction"]
-    axes[0].bar(direction["direction"], direction["transactions"], color="#3f6f8f")
-    axes[0].set_title("Direction")
-    types = tables["types"]
-    axes[1].bar(types["type"], types["transactions"], color="#7b6f9f")
-    axes[1].set_title("Transaction type")
-    axes[1].tick_params(axis="x", rotation=20)
-    fig.tight_layout()
-    charts["direction_types"] = _figure_to_data_uri(fig)
-
-    fig, ax = plt.subplots(figsize=(10, 3.5))
-    fig.patch.set_alpha(0.0)
-    ax.patch.set_alpha(0.0)
-    hist = tables["days_before_hist"]
-    for outcome, group in hist.groupby("eskalatsiya"):
-        share = group["transactions"] / group["transactions"].sum()
-        ax.plot(group["bucket"], share, label=outcome, color=PALETTE[outcome])
-    ax.set_xlabel("Days before the alert")
-    ax.set_ylabel("Share of transactions")
-    ax.set_title("Activity leading up to the alert")
-    ax.legend()
-    charts["days_before"] = _figure_to_data_uri(fig)
-
-    fig, ax = plt.subplots(figsize=(8, 3.5))
-    fig.patch.set_alpha(0.0)
-    ax.patch.set_alpha(0.0)
-    by_type = tables["type_by_outcome"].pivot(
-        index="tranzaksiya_turi", columns="eskalatsiya", values="transactions"
-    )
-    share = by_type.div(by_type.sum(axis=0), axis=1)
-    share.plot.bar(ax=ax, color=[PALETTE[c] for c in share.columns])
-    ax.set_ylabel("Share within outcome")
-    ax.set_title("Transaction type mix by outcome")
-    ax.tick_params(axis="x", rotation=20)
-    charts["type_outcome"] = _figure_to_data_uri(fig)
-
-    return charts
-
-
-def build(output_dir: Path | None = None) -> Path:
-    output_dir = config.DOCS if output_dir is None else output_dir
-    signals = load_signals(config.TRAIN_SIGNALS)
-    tx = prepare_transactions(load_transactions(config.TRAIN_TX), signals)
-    tables = compute(signals, tx)
-    charts = _charts(tables)
-
-    summary_path = config.EXPERIMENTS / "summary.json"
-    summary = json.loads(summary_path.read_text()) if summary_path.exists() else {}
-
-    ablation_rows = "".join(
+new_ablation = """    ablation_rows = "".join(
         f'<tr class="hover:bg-white/[0.02] transition-colors">'
         f'<td class="py-1.5 pl-4 text-slate-200">{row["family"]}</td>'
         f'<td class="py-1.5 text-center font-mono text-slate-300">{row["n_columns"]}</td>'
@@ -111,45 +32,12 @@ def build(output_dir: Path | None = None) -> Path:
         + ("bg-[#34d399] text-[#042f1a] shadow-[0_0_10px_rgba(52,211,153,0.35)]" if row["accepted"] else "bg-[#ef4444] text-white shadow-[0_0_8px_rgba(239,68,68,0.35)]")
         + f'">{"kept" if row["accepted"] else "rejected"}</span></td></tr>'
         for row in summary.get("selection_history", [])
-    )
+    )"""
+content = content.replace(old_ablation, new_ablation)
 
-    html = _TEMPLATE.format(
-        rate=f"{signals['eskalatsiya'].mean():.1%}",
-        alerts=f"{len(signals):,}",
-        transactions=f"{len(tx):,}",
-        columns=summary.get("n_columns", "—"),
-        auc=f"{summary.get('ensemble_cv_mean', float('nan')):.4f}",
-        auc_std=f"{summary.get('ensemble_cv_std', float('nan')):.4f}",
-        best_single=summary.get("best_single_model", "—"),
-        best_single_auc=f"{summary.get('best_single_cv_mean', float('nan')):.4f}",
-        gain=f"{summary.get('ensemble_gain_over_best_single', float('nan')):+.4f}",
-        chance_families=len({
-            r["family"] for r in summary.get("selection_history", [])
-            if r["score"] <= 0.5
-        }),
-        adversarial=(
-            f"{summary['adversarial_auc']:.4f}"
-            if summary.get("adversarial_auc") is not None else "not yet measured"
-        ),
-        drift_verdict=(
-            "indistinguishable"
-            if (summary.get("adversarial_auc") or 1.0) < 0.55
-            else "separable — treat the estimate with caution"
-        ),
-        rejected_families=len({
-            r["family"] for r in summary.get("selection_history", [])
-        }) - len(summary.get("families", [])),
-        ablation_rows=ablation_rows or "<tr><td colspan='5'>Run the pipeline first.</td></tr>",
-        **charts,
-    )
-    output_dir.mkdir(parents=True, exist_ok=True)
-    target = output_dir / "index.html"
-    target.write_text(html, encoding="utf-8")
-    (output_dir / ".nojekyll").write_text("")
-    return target
-
-
-_TEMPLATE = """<!DOCTYPE html>
+# 4. Replace the _TEMPLATE string
+# We use regex to find _TEMPLATE = """...""" and replace it with our combined mega template
+new_template = '''_TEMPLATE = """<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="utf-8"/>
@@ -195,7 +83,12 @@ _TEMPLATE = """<!DOCTYPE html>
     .prism-facets {{ position: absolute; width: 480px; height: 480px; left: 50%; top: 55%; transform: translate(-50%, -48%); background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.18) 48%, rgba(255,255,255,0.3) 50%, transparent 52%), linear-gradient(45deg, transparent 42%, rgba(130,220,255,0.2) 49%, rgba(255,255,255,0.25) 50%, transparent 54%), linear-gradient(70deg, transparent 46%, rgba(255,180,240,0.18) 50%, transparent 53%); filter: blur(4px); opacity: 0.55; pointer-events: none; z-index: 1; }}
     .table-row-border {{ border-bottom: 1px solid rgba(255, 255, 255, 0.08); }}
     
-    .chart-img {{ filter: drop-shadow(0 0 8px rgba(0, 242, 254, 0.4)) drop-shadow(0 0 15px rgba(74, 222, 128, 0.2)); border-radius: 12px; width: 100%; height: auto; }}
+    .chart-img {{
+        filter: drop-shadow(0 0 8px rgba(0, 242, 254, 0.4)) drop-shadow(0 0 15px rgba(74, 222, 128, 0.2));
+        border-radius: 12px;
+        width: 100%;
+        height: auto;
+    }}
 </style>
 </head>
 <body class="min-h-screen relative font-sans flex flex-col items-center p-4 md:p-8 space-y-16">
@@ -211,6 +104,7 @@ _TEMPLATE = """<!DOCTYPE html>
 <main class="relative z-10 w-full max-w-[1360px] bg-[#050b12] rounded-2xl overflow-hidden border border-cyan-950/40 shadow-2xl flex flex-col p-6 sm:p-10 mb-8 mt-4">
 <h1 class="text-3xl md:text-5xl font-normal tracking-wide text-white drop-shadow-md text-center mb-8">AML Alert Prioritization</h1>
 <section class="relative z-10 w-full flex-1 flex flex-wrap items-center justify-around px-2 py-8 my-auto">
+<!-- Cyber Net Lines -->
 <svg class="absolute inset-0 w-full h-full pointer-events-none z-0 hidden lg:block" xmlns="http://www.w3.org/2000/svg">
 <defs>
 <linearGradient id="cyberBeam" x1="0%" x2="100%" y1="0%" y2="0%">
@@ -473,9 +367,14 @@ _TEMPLATE = """<!DOCTYPE html>
       }}
 
       window.addEventListener('resize', resize);
-      setTimeout(resize, 500);
+      setTimeout(resize, 500); // Wait for images to load
       draw();
     }})();
 </script>
 </body>
 </html>"""
+'''
+content = re.sub(r'_TEMPLATE = """.*?"""\s*$', new_template, content, flags=re.DOTALL)
+
+# Write modified content back
+target_path.write_text(content, encoding="utf-8")
