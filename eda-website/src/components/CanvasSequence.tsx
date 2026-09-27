@@ -68,8 +68,8 @@ export const CanvasSequence: React.FC<CanvasSequenceProps> = ({ frameCount, getF
       scrollTrigger: {
         trigger: containerRef.current,
         start: 'top top',
-        end: '+=400%', // Scroll for 4 screen heights
-        scrub: 1.5, // 1.5s smoothing
+        end: '+=800%', // Scroll for 8 screen heights to make it slower
+        scrub: 2, // 2s smoothing for extremely smooth rendering
         pin: true, // Pin the canvas while scrolling
       },
       onUpdate: render,
@@ -85,12 +85,6 @@ export const CanvasSequence: React.FC<CanvasSequenceProps> = ({ frameCount, getF
   return (
     <div ref={containerRef} className="relative w-full h-screen bg-[#030708]">
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full object-cover" />
-      
-      {/* Optional: Overlay texts while scrolling, pinned by ScrollTrigger. 
-          You can add child nodes or absolute divs here later! */}
-      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none opacity-50">
-        <h2 className="text-white text-3xl font-mono mix-blend-overlay">Sequence Placeholder</h2>
-      </div>
     </div>
   );
 };

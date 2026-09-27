@@ -1026,7 +1026,7 @@ function App() {
       {/* --- SCROLL-BOUND VIDEO SEQUENCE --- */}
       <CanvasSequence 
         frameCount={240} 
-        getFrameUrl={(index: number) => `/video-frames/frame_${index}.webp`} 
+        getFrameUrl={(index: number) => `${import.meta.env.BASE_URL}video-frames/frame_${index}.webp`} 
       />
       <EdaSection />
     </LanguageContext.Provider>
