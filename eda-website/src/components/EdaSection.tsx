@@ -1,35 +1,22 @@
 import { useContext, useEffect, useRef } from 'react';
 import { LanguageContext, translations } from '../locales/translations';
 import { data } from '../data/edaData';
+import {
+  fill,
+  PLOT,
+  plotY,
+  linePath,
+  barLayout,
+  compact,
+  charts,
+  daysToAlert,
+  daysMax,
+  typesMax,
+  outcomeMax,
+  weeklyMax,
+  targetMax,
+} from '../lib/fill';
 
-const TOKENS: Record<string, string> = {
-  alerts: data.alerts,
-  transactions: data.transactions,
-  rate: data.rate,
-  columns: data.columns,
-  auc: data.auc,
-  aucStd: data.auc_std,
-  adv: data.adversarial,
-  drift: data.drift_verdict,
-  kept: data.family_level_kept.join(' + '),
-  familiesMeasured: String(data.families_measured),
-  familiesUsed: String(data.families_used),
-  rejected: String(data.rejected_families),
-  chance: String(data.chance_families),
-  nullMean: data.null_mean,
-  holdoutAuc: data.holdout_auc,
-  holdoutCv: data.holdout_cv,
-  holdoutRows: data.holdout_rows,
-  optimism: data.holdout_optimism,
-  gain: data.ensemble_gain,
-  bestSingle: data.best_single_model,
-  bestSingleAuc: data.best_single_auc,
-};
-
-/** Replace every {token} from the generated data; leave unknown ones visible. */
-function fill(template: string): string {
-  return template.replace(/\{(\w+)\}/g, (match, key) => TOKENS[key] ?? match);
-}
 
 export function EdaSection() {
   const lang = useContext(LanguageContext);
@@ -271,29 +258,46 @@ export function EdaSection() {
                     <text textAnchor="end" x="40" y="159">400</text>
                     <text textAnchor="end" x="40" y="204">200</text>
                     <text textAnchor="end" x="40" y="222">0</text>
-                    <text fill="#64748b" fontSize="9" textAnchor="middle" x="45" y="235">{t.day30}</text>
-                    <text textAnchor="middle" x="135" y="235">{t.day20}</text>
-                    <text textAnchor="middle" x="230" y="235">{t.day10}</text>
-                    <text textAnchor="middle" x="325" y="235">{t.day5}</text>
-                    <text textAnchor="middle" x="410" y="235">{t.alertDate}</text>
+                    <text fill="#64748b" fontSize="9" textAnchor="middle" x="48" y="235">180</text>
+                    <text fill="#64748b" fontSize="9" textAnchor="middle" x="146" y="235">135</text>
+                    <text fill="#64748b" fontSize="9" textAnchor="middle" x="243" y="235">90</text>
+                    <text fill="#64748b" fontSize="9" textAnchor="middle" x="341" y="235">45</text>
+                    <text fill="#64748b" fontSize="9" textAnchor="middle" x="428" y="235">{t.alertDate}</text>
                     <text fill="#cbd5e1" fontSize="11" textAnchor="middle" x="235" y="255">{t.daysToAlert}</text>
                     <text fill="#cbd5e1" fontSize="11" textAnchor="middle" transform="rotate(-90)" x="-110" y="12">{t.transactions}</text>
                   </g>
-                  <path className="glow-cyan" d="M 45,215 L 50,210 L 53,195 L 55,145 L 57,190 L 63,212 L 72,210 L 80,205 
-                                         L 88,212 L 95,198 L 102,185 L 110,195 L 118,170 L 126,178 L 132,165 
-                                         L 138,185 L 145,150 L 150,170 L 157,142 L 165,180 L 172,130 L 178,162 
-                                         L 186,145 L 194,175 L 202,135 L 210,165 L 216,140 L 225,180 L 235,115 
-                                         L 242,165 L 250,135 L 258,185 L 265,130 L 273,150 L 280,105 L 288,140 
-                                         L 295,95 L 302,170 L 310,120 L 318,160 L 325,82 L 332,150 L 340,90 
-                                         L 348,155 L 355,80 L 362,175 L 370,110 L 378,60 L 385,160 L 392,80 
-                                         L 400,30 L 406,120 L 413,85 L 420,130 L 426,170" fill="none" stroke="url(#neonGradient1)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.6"></path>
+                  <path
+                    className="glow-cyan"
+                    d={linePath(daysToAlert.map((r) => r.dismissed), daysMax)}
+                    fill="none"
+                    stroke="url(#neonGradient1)"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2.6"
+                  ></path>
+                  <path
+                    d={linePath(daysToAlert.map((r) => r.escalated), daysMax)}
+                    fill="none"
+                    stroke="#d36a52"
+                    strokeDasharray="5 4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                  ></path>
+                  <g fontFamily="monospace" fontSize="9">
+                    <rect fill="#0b1220" fillOpacity="0.8" height="34" rx="3" width="120" x="312" y="30"></rect>
+                    <line stroke="#00f2fe" strokeWidth="2.5" x1="320" x2="340" y1="41" y2="41"></line>
+                    <text fill="#cbd5e1" x="346" y="44">{t.dismissed}</text>
+                    <line stroke="#d36a52" strokeDasharray="5 4" strokeWidth="2.5" x1="320" x2="340" y1="55" y2="55"></line>
+                    <text fill="#cbd5e1" x="346" y="58">{t.escalated}</text>
+                  </g>
                 </svg>
               </div>
             </div>
             <div className="md:col-span-5 p-4 sm:p-6 flex flex-col justify-center">
               <h2 className="text-white text-lg font-medium mb-4">{t.timeActivity}</h2>
-              <p className="text-slate-400 text-sm leading-relaxed mb-4">{t.timeActivityDesc1}</p>
-              <p className="text-slate-400 text-sm leading-relaxed">{t.timeActivityDesc2}</p>
+              <p className="text-slate-400 text-sm leading-relaxed mb-4">{fill(t.timeActivityDesc1)}</p>
+              <p className="text-slate-400 text-sm leading-relaxed">{fill(t.timeActivityDesc2)}</p>
             </div>
           </article>
 
@@ -323,31 +327,33 @@ export function EdaSection() {
                     <text fill="#cbd5e1" fontSize="11" textAnchor="middle" transform="rotate(-90)" x="-110" y="10">{t.transactions}</text>
                     <text fill="#cbd5e1" fontSize="11" textAnchor="middle" x="250" y="255">{t.transactions}</text>
                   </g>
-                  <rect className="glow-cyan" fill="#00f2fe" fillOpacity="0.08" height="196" rx="3" stroke="#00f2fe" strokeWidth="2.5" width="28" x="58" y="20"></rect>
-                  <rect className="glow-green" fill="#4ade80" fillOpacity="0.08" height="131" rx="3" stroke="#4ade80" strokeWidth="2.5" width="28" x="105" y="85"></rect>
-                  <rect className="glow-cyan" fill="#00f2fe" fillOpacity="0.08" height="111" rx="3" stroke="#00f2fe" strokeWidth="2.5" width="28" x="152" y="105"></rect>
-                  <rect className="glow-lime" fill="#a3e635" fillOpacity="0.08" height="71" rx="3" stroke="#a3e635" strokeWidth="2.5" width="28" x="199" y="145"></rect>
-                  <rect className="glow-cyan" fill="#00f2fe" fillOpacity="0.08" height="74" rx="3" stroke="#00f2fe" strokeWidth="2.5" width="28" x="246" y="142"></rect>
-                  <rect className="glow-cyan" fill="#00f2fe" fillOpacity="0.08" height="64" rx="3" stroke="#00f2fe" strokeWidth="2.5" width="28" x="293" y="152"></rect>
-                  <rect className="glow-lime" fill="#a3e635" fillOpacity="0.08" height="38" rx="3" stroke="#a3e635" strokeWidth="2.5" width="28" x="340" y="178"></rect>
-                  <rect className="glow-lime" fill="#a3e635" fillOpacity="0.08" height="32" rx="3" stroke="#a3e635" strokeWidth="2.5" width="28" x="387" y="184"></rect>
+                  {charts.types.map((row, i) => {
+                    const slot = barLayout(charts.types.length)[i];
+                    const top = plotY(row.n, typesMax);
+                    const palette = ['#00f2fe', '#4ade80', '#a3e635', '#22d3ee'];
+                    return (
+                      <g key={row.label}>
+                        <rect className="glow-cyan" fill={palette[i]} fillOpacity="0.08" height={Math.max(PLOT.yBase - top, 1)} rx="3" stroke={palette[i]} strokeWidth="2.5" width={slot.width} x={slot.x} y={top}></rect>
+                        <text fill="#cbd5e1" fontFamily="monospace" fontSize="9" textAnchor="middle" x={slot.x + slot.width / 2} y={top - 6}>{compact(row.n)}</text>
+                      </g>
+                    );
+                  })}
                   <g fill="#94a3b8" fontFamily="sans-serif" fontSize="9">
-                    <text transform="rotate(30, 70, 226)" x="70" y="226">{t.cat1}</text>
-                    <text transform="rotate(30, 117, 226)" x="117" y="226">{t.cat2}</text>
-                    <text transform="rotate(30, 164, 226)" x="164" y="226">{t.cat3}</text>
-                    <text transform="rotate(30, 211, 226)" x="211" y="226">{t.cat4}</text>
-                    <text transform="rotate(30, 258, 226)" x="258" y="226">{t.cat5}</text>
-                    <text transform="rotate(30, 305, 226)" x="305" y="226">{t.cat6}</text>
-                    <text transform="rotate(30, 352, 226)" x="352" y="226">{t.cat7}</text>
-                    <text transform="rotate(30, 399, 226)" x="399" y="226">{t.cat8}</text>
+                    {charts.types.map((row, i) => {
+                      const slot = barLayout(charts.types.length)[i];
+                      const cx = slot.x + slot.width / 2;
+                      return (
+                        <text key={row.label} transform={`rotate(20, ${cx}, 228)`} x={cx} y="228">{row.label}</text>
+                      );
+                    })}
                   </g>
                 </svg>
               </div>
             </div>
             <div className="md:col-span-5 p-4 sm:p-6 flex flex-col justify-center">
               <h2 className="text-white text-lg font-medium mb-4">{t.transactionTypes}</h2>
-              <p className="text-slate-400 text-sm leading-relaxed mb-4">{t.transactionTypesDesc1}</p>
-              <p className="text-slate-400 text-sm leading-relaxed">{t.transactionTypesDesc2}</p>
+              <p className="text-slate-400 text-sm leading-relaxed mb-4">{fill(t.transactionTypesDesc1)}</p>
+              <p className="text-slate-400 text-sm leading-relaxed">{fill(t.transactionTypesDesc2)}</p>
             </div>
           </article>
 
@@ -357,7 +363,7 @@ export function EdaSection() {
           <article className="grid grid-cols-1 md:grid-cols-12 gap-5 items-stretch" data-purpose="chart-card-group">
             <div className="md:col-span-5 order-2 md:order-1 p-4 sm:p-6 flex flex-col justify-center">
               <h2 className="text-white text-lg font-medium mb-4 leading-snug">{t.patternBurst}</h2>
-              <p className="text-slate-400 text-sm leading-relaxed">{t.patternBurstDesc}</p>
+              <p className="text-slate-400 text-sm leading-relaxed">{fill(t.patternBurstDesc)}</p>
             </div>
             <div className="md:col-span-7 order-1 md:order-2 flex flex-col justify-end pt-4 pr-2">
               <div className="relative w-full aspect-[16/10] sm:aspect-[16/9]">
@@ -391,16 +397,20 @@ export function EdaSection() {
                     <text fill="#cbd5e1" fontSize="11" textAnchor="middle" x="270" y="255">{t.date}</text>
                     <text fill="#cbd5e1" fontSize="11" textAnchor="middle" transform="rotate(-90)" x="-125" y="12">{t.activityLevel}</text>
                   </g>
-                  <path className="glow-cyan" d="M 52,205 C 55,200 60,195 65,198 C 70,202 75,212 85,212 
-                                         C 95,212 100,202 110,203 C 120,204 125,208 135,208 
-                                         C 145,208 152,196 160,198 C 170,200 178,212 188,210 
-                                         C 198,208 205,196 215,197 C 225,198 230,207 240,205 
-                                         C 248,203 252,185 260,186 C 268,187 274,204 282,200 
-                                         C 288,197 292,175 298,170 C 304,165 308,182 314,180 
-                                         C 322,176 325,145 330,140 C 335,135 340,165 344,160 
-                                         C 348,155 352,125 356,85 C 360,40 366,35 370,85 
-                                         C 374,130 378,160 382,125 C 386,95 390,140 395,150 
-                                         C 400,160 404,180 408,165 C 412,145 418,105 422,125" fill="none" stroke="url(#neonGradient2)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.6"></path>
+                  <path
+                    className="glow-cyan"
+                    d={linePath(charts.weekly.map((r) => r.n), weeklyMax)}
+                    fill="none"
+                    stroke="url(#neonGradient1)"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2.4"
+                  ></path>
+                  <g fill="#64748b" fontFamily="monospace" fontSize="9" textAnchor="middle">
+                    <text x={PLOT.x0} y="236">{charts.weekly[0]?.t.slice(0, 7)}</text>
+                    <text x={(PLOT.x0 + PLOT.x1) / 2} y="236">{charts.weekly[Math.floor(charts.weekly.length / 2)]?.t.slice(0, 7)}</text>
+                    <text x={PLOT.x1} y="236">{charts.weekly[charts.weekly.length - 1]?.t.slice(0, 7)}</text>
+                  </g>
                 </svg>
               </div>
             </div>
@@ -431,30 +441,21 @@ export function EdaSection() {
                     <text fill="#cbd5e1" fontSize="11" textAnchor="middle" transform="rotate(-90)" x="-110" y="10">{t.transactionTypes}</text>
                   </g>
                   
-                  <g className="glow-cyan">
-                    <rect fill="#a3e635" fillOpacity="0.1" height="6" rx="2" stroke="#a3e635" strokeWidth="2" width="28" x="58" y="24"></rect>
-                    <rect fill="#4ade80" fillOpacity="0.1" height="8" rx="2" stroke="#4ade80" strokeWidth="2" width="28" x="58" y="32"></rect>
-                    <rect fill="#00f2fe" fillOpacity="0.1" height="158" rx="2" stroke="#00f2fe" strokeWidth="2.5" width="28" x="58" y="42"></rect>
-                  </g>
-                  <g className="glow-cyan">
-                    <rect fill="#4ade80" fillOpacity="0.1" height="14" rx="2" stroke="#4ade80" strokeWidth="2" width="28" x="122" y="24"></rect>
-                    <rect fill="#131e33" height="52" rx="2" stroke="#22d3ee" strokeWidth="1.8" width="28" x="122" y="40"></rect>
-                    <rect fill="#00f2fe" fillOpacity="0.1" height="106" rx="2" stroke="#00f2fe" strokeWidth="2.5" width="28" x="122" y="94"></rect>
-                  </g>
-                  <g className="glow-cyan">
-                    <rect fill="#a3e635" fillOpacity="0.1" height="14" rx="2" stroke="#a3e635" strokeWidth="2" width="28" x="186" y="24"></rect>
-                    <rect fill="#00f2fe" fillOpacity="0.1" height="160" rx="2" stroke="#00f2fe" strokeWidth="2.5" width="28" x="186" y="40"></rect>
-                  </g>
-                  <g className="glow-cyan">
-                    <rect fill="#4ade80" fillOpacity="0.1" height="18" rx="2" stroke="#4ade80" strokeWidth="2" width="28" x="250" y="24"></rect>
-                    <rect fill="#131e33" height="30" rx="2" stroke="#22d3ee" strokeWidth="1.8" width="28" x="250" y="44"></rect>
-                    <rect fill="#00f2fe" fillOpacity="0.1" height="124" rx="2" stroke="#00f2fe" strokeWidth="2.5" width="28" x="250" y="76"></rect>
-                  </g>
-                  <g className="glow-cyan">
-                    <rect fill="#a3e635" fillOpacity="0.1" height="66" rx="2" stroke="#a3e635" strokeWidth="2.5" width="28" x="314" y="24"></rect>
-                    <rect fill="#131e33" height="50" rx="2" stroke="#22d3ee" strokeWidth="2" width="28" x="314" y="92"></rect>
-                    <rect fill="#00f2fe" fillOpacity="0.1" height="56" rx="2" stroke="#00f2fe" strokeWidth="2.5" width="28" x="314" y="144"></rect>
-                  </g>
+                  {charts.typesByOutcome.map((row, i) => {
+                    const slot = barLayout(charts.typesByOutcome.length, 36)[i];
+                    const half = slot.width / 2 - 2;
+                    const dTop = plotY(row.dismissed, outcomeMax);
+                    const eTop = plotY(row.escalated, outcomeMax);
+                    return (
+                      <g className="glow-cyan" key={row.label}>
+                        <rect fill="#00f2fe" fillOpacity="0.12" height={Math.max(PLOT.yBase - dTop, 1)} rx="2" stroke="#00f2fe" strokeWidth="2" width={half} x={slot.x} y={dTop}></rect>
+                        <rect fill="#d36a52" fillOpacity="0.12" height={Math.max(PLOT.yBase - eTop, 1)} rx="2" stroke="#d36a52" strokeWidth="2" width={half} x={slot.x + half + 4} y={eTop}></rect>
+                        <text fill="#cbd5e1" fontFamily="monospace" fontSize="8.5" textAnchor="middle" transform={`rotate(20, ${slot.x + slot.width / 2}, 230)`} x={slot.x + slot.width / 2} y="230">
+                          {row.label}
+                        </text>
+                      </g>
+                    );
+                  })}
 
                   <g fill="#94a3b8" fontFamily="sans-serif" fontSize="9">
                     <rect fill="#00f2fe" height="7" width="7" x="390" y="32"></rect>
@@ -476,8 +477,8 @@ export function EdaSection() {
             </div>
             <div className="md:col-span-5 p-4 sm:p-6 flex flex-col justify-center">
               <h2 className="text-white text-lg font-medium mb-4 leading-snug">{t.typesByOutcome}</h2>
-              <p className="text-slate-400 text-sm leading-relaxed mb-4">{t.typesByOutcomeDesc1}</p>
-              <p className="text-slate-400 text-sm leading-relaxed">{t.typesByOutcomeDesc2}</p>
+              <p className="text-slate-400 text-sm leading-relaxed mb-4">{fill(t.typesByOutcomeDesc1)}</p>
+              <p className="text-slate-400 text-sm leading-relaxed">{fill(t.typesByOutcomeDesc2)}</p>
             </div>
           </article>
         </div>
@@ -486,8 +487,41 @@ export function EdaSection() {
         <div className="w-full mt-8 md:mt-10">
           <article className="grid grid-cols-1 md:grid-cols-12 gap-5 items-stretch lg:col-span-2" data-purpose="chart-card-group">
             <div className="md:col-span-6 flex flex-col justify-end">
-              <div className="relative w-full aspect-[2/1] sm:aspect-[16/9] rounded-xl border border-dashed border-cyan-500/20 bg-cyan-900/10 flex items-center justify-center">
-                 <span className="text-cyan-500/40 font-mono text-sm">{t.targetPlaceholder}</span>
+              <div className="relative w-full aspect-[16/10]">
+                <svg aria-label={t.targetDistTitle} className="w-full h-full overflow-visible" viewBox="0 0 460 260">
+                  <g stroke="#232d42" strokeWidth="1">
+                    {[0, 0.25, 0.5, 0.75, 1].map((f) => (
+                      <line key={f} x1="48" x2="438" y1={PLOT.yBase - f * (PLOT.yBase - PLOT.yTop)} y2={PLOT.yBase - f * (PLOT.yBase - PLOT.yTop)}></line>
+                    ))}
+                  </g>
+                  {charts.targetDist.map((row, i) => {
+                    const slot = barLayout(charts.targetDist.length, 110)[i];
+                    const top = plotY(row.n, targetMax);
+                    const colour = i === 0 ? '#00f2fe' : '#d36a52';
+                    return (
+                      <g key={row.label}>
+                        <rect
+                          className="glow-cyan"
+                          fill={colour}
+                          fillOpacity="0.12"
+                          height={Math.max(PLOT.yBase - top, 1)}
+                          rx="3"
+                          stroke={colour}
+                          strokeWidth="2.5"
+                          width={slot.width}
+                          x={slot.x}
+                          y={top}
+                        ></rect>
+                        <text fill="#e2e8f0" fontFamily="monospace" fontSize="13" textAnchor="middle" x={slot.x + slot.width / 2} y={top - 8}>
+                          {row.n.toLocaleString('en-US')}
+                        </text>
+                        <text fill="#cbd5e1" fontSize="11" textAnchor="middle" x={slot.x + slot.width / 2} y="232">
+                          {i === 0 ? t.dismissed : t.escalated}
+                        </text>
+                      </g>
+                    );
+                  })}
+                </svg>
               </div>
             </div>
             <div className="md:col-span-6 p-4 sm:p-6 flex flex-col justify-center">

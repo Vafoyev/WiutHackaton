@@ -117,6 +117,114 @@ def build_web_data(
     return result
 
 
+DAYS_BUCKETS = 18          # 0-180 days in 10-day steps
+WEEKLY_MAX_POINTS = 70     # enough resolution for a 460x260 viewBox
+AMOUNT_BINS = 24
+
+
+def chart_series(signals, tx) -> dict:
+    """Real series for every chart on the page.
+
+    The page shipped hand-drawn SVG geometry: eight bars for a four-category
+    field, an invented activity curve, and a placeholder box where the target
+    distribution belongs. Everything here is computed from the data instead.
+    """
+    import numpy as np
+    import pandas as pd
+
+    from src.config import DIRECTIONS, TARGET, TX_TYPES
+
+    labelled = tx.merge(signals[["signal_id", TARGET]], on="signal_id", how="inner")
+    outcome = labelled[TARGET].map({0: "dismissed", 1: "escalated"})
+
+    counts = signals[TARGET].value_counts()
+    target_dist = [
+        {"label": "Dismissed", "n": int(counts.get(0, 0))},
+        {"label": "Escalated", "n": int(counts.get(1, 0))},
+    ]
+
+    direction = [
+        {"label": name, "n": int((tx["kirim_chiqim"] == name).sum())}
+        for name in DIRECTIONS
+    ]
+    types = [
+        {"label": name, "n": int((tx["tranzaksiya_turi"] == name).sum())}
+        for name in TX_TYPES
+    ]
+
+    # Activity before the alert, as a share within each outcome: escalated alerts
+    # are a fifth of the data, so raw counts would compare class sizes instead.
+    edges = np.arange(0, (DAYS_BUCKETS + 1) * 10, 10)
+    bucket = pd.cut(labelled["days_before"], bins=edges, right=False, labels=edges[:-1])
+    grid = (
+        pd.crosstab(bucket.astype("float64"), outcome)
+        .reindex(index=edges[:-1].astype(float), columns=["dismissed", "escalated"])
+        .fillna(0.0)
+    )
+    shares = grid.div(grid.sum(axis=0).replace(0, np.nan), axis=1).fillna(0.0)
+    days_before = [
+        {"bucket": float(idx), "dismissed": round(float(row["dismissed"]), 6),
+         "escalated": round(float(row["escalated"]), 6)}
+        for idx, row in shares.iterrows()
+    ]
+
+    type_grid = (
+        pd.crosstab(labelled["tranzaksiya_turi"], outcome)
+        .reindex(index=list(TX_TYPES), columns=["dismissed", "escalated"])
+        .fillna(0.0)
+    )
+    type_shares = type_grid.div(type_grid.sum(axis=0).replace(0, np.nan), axis=1).fillna(0.0)
+    types_by_outcome = [
+        {"label": idx, "dismissed": round(float(row["dismissed"]), 6),
+         "escalated": round(float(row["escalated"]), 6)}
+        for idx, row in type_shares.iterrows()
+    ]
+
+    weekly_counts = tx.set_index("tranzaksiya_vaqti").resample("W").size()
+    step = max(1, len(weekly_counts) // WEEKLY_MAX_POINTS)
+    weekly = [
+        {"t": stamp.strftime("%Y-%m-%d"), "n": int(value)}
+        for stamp, value in weekly_counts.iloc[::step].items()
+    ]
+
+    hist, bin_edges = np.histogram(labelled["miqdor_indeksi"].to_numpy(), bins=AMOUNT_BINS)
+    amount_hist = [
+        {"x": round(float(bin_edges[i]), 3), "n": int(hist[i])} for i in range(len(hist))
+    ]
+
+    volume = labelled.groupby([TARGET, "signal_id"]).size().groupby(level=0).median()
+    volume_by_outcome = [
+        {"label": "Dismissed", "median": float(volume.get(0, 0))},
+        {"label": "Escalated", "median": float(volume.get(1, 0))},
+    ]
+
+    incoming = next((r["n"] for r in direction if r["label"] == "kirim"), 0)
+    facts = {
+        "historyDays": int(DAYS_BUCKETS * 10),
+        "incomingShare": round(incoming / max(len(tx), 1), 6),
+        # Both outcomes spike in the final ten days; the captions must not claim
+        # the spike distinguishes them.
+        "lastTenDaysShare": round(days_before[0]["dismissed"], 6) if days_before else 0.0,
+        "typeMixMaxGap": round(
+            max((abs(r["dismissed"] - r["escalated"]) for r in types_by_outcome), default=0.0), 6
+        ),
+        "topType": max(types, key=lambda r: r["n"])["label"] if types else "",
+        "topTypeShare": round(max((r["n"] for r in types), default=0) / max(len(tx), 1), 6),
+    }
+
+    return {
+        "facts": facts,
+        "targetDist": target_dist,
+        "direction": direction,
+        "types": types,
+        "daysBefore": days_before,
+        "typesByOutcome": types_by_outcome,
+        "weekly": weekly,
+        "amountHist": amount_hist,
+        "volumeByOutcome": volume_by_outcome,
+    }
+
+
 def render_typescript(payload: dict) -> str:
     body = json.dumps(payload, indent=2, ensure_ascii=False)
     return (
@@ -139,6 +247,7 @@ def main() -> None:
         transactions=len(tx),
         positive_rate=float(signals[config.TARGET].mean()),
     )
+    payload["charts"] = chart_series(signals, tx)
     TARGET_FILE.parent.mkdir(parents=True, exist_ok=True)
     TARGET_FILE.write_text(render_typescript(payload), encoding="utf-8")
     print(f"wrote {TARGET_FILE}")

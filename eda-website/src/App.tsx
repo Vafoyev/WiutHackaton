@@ -3,6 +3,7 @@ import { CanvasSequence } from './components/CanvasSequence';
 import { HeroSection } from './components/HeroSection';
 import { EdaSection } from './components/EdaSection';
 import { LanguageContext, translations } from './locales/translations';
+import { fill } from './lib/fill';
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
 import './index.css';
@@ -33,7 +34,7 @@ function App() {
       <HeroSection />
       {/* --- SCROLL-BOUND VIDEO SEQUENCE --- */}
       <CanvasSequence 
-        texts={[t.seq1, t.seq2, t.seq3, t.seq4]}
+        texts={[t.seq1, t.seq2, t.seq3, t.seq4].map(fill)}
         frameCount={240} 
         getFrameUrl={(index: number) => `${import.meta.env.BASE_URL}video-frames/frame_${index}.webp`} 
       />

@@ -133,3 +133,107 @@ def test_family_usage_counts_columns_per_family(recorded):
     assert by_family["direction_type"] == 3
     assert by_family["base"] == 1
     assert result["families_used"] == 2
+
+
+def _tiny_signals():
+    import pandas as pd
+    return pd.DataFrame({
+        "signal_id": ["A", "B", "C"],
+        "signal_sanasi": pd.to_datetime(["2025-03-10", "2025-03-11", "2025-03-12"]),
+        "eskalatsiya": [0, 1, 0],
+    })
+
+
+def _tiny_prepared():
+    import numpy as np
+    import pandas as pd
+    rows = []
+    for sid, day in [("A", "2025-03-10"), ("B", "2025-03-11"), ("C", "2025-03-12")]:
+        for k, (d, t, amt) in enumerate([
+            ("kirim", "karta", 1.0), ("chiqim", "naqd", -0.5), ("kirim", "xalqaro", 2.0),
+        ]):
+            rows.append({
+                "signal_id": sid,
+                "tranzaksiya_vaqti": pd.Timestamp(day) - pd.Timedelta(days=5 * k),
+                "kirim_chiqim": d, "tranzaksiya_turi": t, "miqdor_indeksi": amt,
+                "days_before": 5.0 * k, "out": 1 if d == "chiqim" else 0,
+                "hour": 12, "dow": 2,
+            })
+    return pd.DataFrame(rows)
+
+
+def test_chart_series_uses_only_the_four_real_transaction_types():
+    """The page drew eight bars for transaction types; the dataset has four."""
+    from src import config
+    from src.web_data import chart_series
+
+    charts = chart_series(_tiny_signals(), _tiny_prepared())
+    assert [row["label"] for row in charts["types"]] == list(config.TX_TYPES)
+
+
+def test_chart_series_target_counts_match_the_labels():
+    from src.web_data import chart_series
+
+    charts = chart_series(_tiny_signals(), _tiny_prepared())
+    by_label = {row["label"]: row["n"] for row in charts["targetDist"]}
+    assert by_label == {"Dismissed": 2, "Escalated": 1}
+
+
+def test_chart_series_directions_cover_every_transaction():
+    from src.web_data import chart_series
+
+    prepared = _tiny_prepared()
+    charts = chart_series(_tiny_signals(), prepared)
+    assert sum(row["n"] for row in charts["direction"]) == len(prepared)
+
+
+def test_days_before_series_is_expressed_as_shares_within_each_outcome():
+    """Escalated alerts are a fifth of the data, so raw counts would compare
+    the class sizes rather than the behaviour."""
+    from src.web_data import chart_series
+
+    charts = chart_series(_tiny_signals(), _tiny_prepared())
+    for key in ("dismissed", "escalated"):
+        total = sum(row[key] for row in charts["daysBefore"])
+        assert abs(total - 1.0) < 1e-5 or total == 0.0, (key, total)
+
+
+def test_types_by_outcome_is_share_within_outcome():
+    from src.web_data import chart_series
+
+    charts = chart_series(_tiny_signals(), _tiny_prepared())
+    for key in ("dismissed", "escalated"):
+        total = sum(row[key] for row in charts["typesByOutcome"])
+        assert abs(total - 1.0) < 1e-5 or total == 0.0, (key, total)
+
+
+def test_weekly_volume_is_downsampled_for_the_svg():
+    from src.web_data import chart_series
+
+    charts = chart_series(_tiny_signals(), _tiny_prepared())
+    assert 0 < len(charts["weekly"]) <= 80
+    assert all({"t", "n"} <= set(row) for row in charts["weekly"])
+
+
+def test_chart_series_exposes_the_shares_the_captions_quote():
+    """Captions claimed escalated alerts have an 'anomalous' type distribution.
+    The real gap is under a percentage point, so the caption must quote it."""
+    from src.web_data import chart_series
+
+    charts = chart_series(_tiny_signals(), _tiny_prepared())
+    facts = charts["facts"]
+    assert facts["historyDays"] == 180
+    assert 0.0 <= facts["incomingShare"] <= 1.0
+    assert 0.0 <= facts["lastTenDaysShare"] <= 1.0
+    # Largest absolute dismissed-vs-escalated gap across transaction types.
+    assert facts["typeMixMaxGap"] >= 0.0
+
+
+def test_type_mix_gap_matches_the_series_it_summarises():
+    from src.web_data import chart_series
+
+    charts = chart_series(_tiny_signals(), _tiny_prepared())
+    expected = max(
+        abs(row["dismissed"] - row["escalated"]) for row in charts["typesByOutcome"]
+    )
+    assert abs(charts["facts"]["typeMixMaxGap"] - expected) < 1e-9
