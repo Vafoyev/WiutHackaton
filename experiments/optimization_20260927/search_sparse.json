@@ -1,0 +1,206 @@
+[
+  {
+    "id": "sparse_relative_basic_0.01",
+    "model": "logreg",
+    "features": "relative_basic",
+    "params": {
+      "C": 0.01,
+      "solver": "liblinear",
+      "l1_ratio": 1
+    },
+    "mean": 0.6486588693325881,
+    "std": 0.0006399647007466758,
+    "repeats": [
+      0.6492988340333348,
+      0.6480189046318414
+    ],
+    "seconds": 1.2282004579901695
+  },
+  {
+    "id": "sparse_relative_basic_0.03",
+    "model": "logreg",
+    "features": "relative_basic",
+    "params": {
+      "C": 0.03,
+      "solver": "liblinear",
+      "l1_ratio": 1
+    },
+    "mean": 0.6521495757409173,
+    "std": 0.0005057662161363496,
+    "repeats": [
+      0.6516438095247808,
+      0.6526553419570535
+    ],
+    "seconds": 2.00452220797888
+  },
+  {
+    "id": "sparse_relative_basic_0.1",
+    "model": "logreg",
+    "features": "relative_basic",
+    "params": {
+      "C": 0.1,
+      "solver": "liblinear",
+      "l1_ratio": 1
+    },
+    "mean": 0.6507859336402597,
+    "std": 0.0005887458514963195,
+    "repeats": [
+      0.6501971877887633,
+      0.651374679491756
+    ],
+    "seconds": 3.8229019999853335
+  },
+  {
+    "id": "sparse_compact_0.01",
+    "model": "logreg",
+    "features": "compact",
+    "params": {
+      "C": 0.01,
+      "solver": "liblinear",
+      "l1_ratio": 1
+    },
+    "mean": 0.6206463978137106,
+    "std": 0.0011067351097530098,
+    "repeats": [
+      0.6217531329234636,
+      0.6195396627039575
+    ],
+    "seconds": 3.573370917001739
+  },
+  {
+    "id": "sparse_compact_0.03",
+    "model": "logreg",
+    "features": "compact",
+    "params": {
+      "C": 0.03,
+      "solver": "liblinear",
+      "l1_ratio": 1
+    },
+    "mean": 0.6466752624240929,
+    "std": 0.00020930565216426,
+    "repeats": [
+      0.6468845680762572,
+      0.6464659567719286
+    ],
+    "seconds": 5.659459292015526
+  },
+  {
+    "id": "sparse_compact_0.1",
+    "model": "logreg",
+    "features": "compact",
+    "params": {
+      "C": 0.1,
+      "solver": "liblinear",
+      "l1_ratio": 1
+    },
+    "mean": 0.6478427462125462,
+    "std": 0.00011757705966702892,
+    "repeats": [
+      0.6479603232722132,
+      0.6477251691528791
+    ],
+    "seconds": 5.120272833999479
+  },
+  {
+    "id": "sparse_location_relative_0.01",
+    "model": "logreg",
+    "features": "location_relative",
+    "params": {
+      "C": 0.01,
+      "solver": "liblinear",
+      "l1_ratio": 1
+    },
+    "mean": 0.6486574350773198,
+    "std": 0.0006500044876253663,
+    "repeats": [
+      0.6493074395649451,
+      0.6480074305896943
+    ],
+    "seconds": 3.0876104590133764
+  },
+  {
+    "id": "sparse_location_relative_0.03",
+    "model": "logreg",
+    "features": "location_relative",
+    "params": {
+      "C": 0.03,
+      "solver": "liblinear",
+      "l1_ratio": 1
+    },
+    "mean": 0.6522134797812078,
+    "std": 0.00010640580474347017,
+    "repeats": [
+      0.6521070739764644,
+      0.6523198855859513
+    ],
+    "seconds": 6.897239084006287
+  },
+  {
+    "id": "sparse_location_relative_0.1",
+    "model": "logreg",
+    "features": "location_relative",
+    "params": {
+      "C": 0.1,
+      "solver": "liblinear",
+      "l1_ratio": 1
+    },
+    "mean": 0.6503150357633145,
+    "std": 0.00039105766700603395,
+    "repeats": [
+      0.6499239780963084,
+      0.6507060934303205
+    ],
+    "seconds": 6.413435374997789
+  },
+  {
+    "id": "sparse_compact_relative_0.01",
+    "model": "logreg",
+    "features": "compact_relative",
+    "params": {
+      "C": 0.01,
+      "solver": "liblinear",
+      "l1_ratio": 1
+    },
+    "mean": 0.6504146527597876,
+    "std": 0.0006820999332974864,
+    "repeats": [
+      0.6510967526930851,
+      0.6497325528264901
+    ],
+    "seconds": 8.242663749988424
+  },
+  {
+    "id": "sparse_compact_relative_0.03",
+    "model": "logreg",
+    "features": "compact_relative",
+    "params": {
+      "C": 0.03,
+      "solver": "liblinear",
+      "l1_ratio": 1
+    },
+    "mean": 0.6536142053486375,
+    "std": 0.0012534594237073593,
+    "repeats": [
+      0.6548676647723448,
+      0.6523607459249301
+    ],
+    "seconds": 7.143336334003834
+  },
+  {
+    "id": "sparse_compact_relative_0.1",
+    "model": "logreg",
+    "features": "compact_relative",
+    "params": {
+      "C": 0.1,
+      "solver": "liblinear",
+      "l1_ratio": 1
+    },
+    "mean": 0.646605238894657,
+    "std": 0.0013339848889413752,
+    "repeats": [
+      0.6479392237835985,
+      0.6452712540057157
+    ],
+    "seconds": 8.562593750015367
+  }
+]

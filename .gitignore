@@ -17,3 +17,8 @@ fintech_data/
 docs-static/
 screenshot*.png
 temp_usta_ai2/
+
+# Rebuildable optimization caches and row-level validation predictions.
+experiments/optimization_*/oof_*.npy
+experiments/optimization_*/audit_predictions.csv
+experiments/nested_*/repeat_*_fold_*.npz

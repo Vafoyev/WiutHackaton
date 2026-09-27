@@ -172,6 +172,17 @@ def _predict_and_write(
 
 def predict_from_saved():
     """Reproduce the submission from a recorded run, without re-searching."""
+    if (SUMMARY_PATH == config.EXPERIMENTS / "summary.json"
+            and (config.EXPERIMENTS / "active_model.json").exists()):
+        active = json.loads((config.EXPERIMENTS / "active_model.json").read_text())
+        if active["pipeline"] == "src.nested_model":
+            from src.nested_model import predict_active
+        elif active["pipeline"] == "src.optimize":
+            from src.optimize import predict_active
+        else:
+            raise ValueError("Unknown active model pipeline")
+
+        return predict_active()
     if not SUMMARY_PATH.exists():
         raise FileNotFoundError(
             f"{SUMMARY_PATH} not found. Run `python -m src.pipeline` first; "
@@ -199,4 +210,12 @@ def predict_from_saved():
 
 
 if __name__ == "__main__":
-    run()
+    import argparse
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--legacy-search", action="store_true", help="Explicitly rerun the original expensive search")
+    args = parser.parse_args()
+    if (config.EXPERIMENTS / "active_model.json").exists() and not args.legacy_search:
+        predict_from_saved()
+    else:
+        run()

@@ -110,3 +110,33 @@ def test_signal_date_features_are_computed_against_a_fixed_reference():
 
     assert test_feat.loc["SG_9", "sig_tnum"] == train_feat.loc["SG_1", "sig_tnum"]
     assert test_feat.loc["SG_9", "sig_same_day_n"] == train_feat.loc["SG_1", "sig_same_day_n"]
+
+
+def test_cross_amount_family_builds_amount_stats_per_direction_and_type():
+    """The selected columns are amount statistics per type and per direction.
+    The direction x type cross only ever produced counts and shares, so the
+    amount statistics on that cross were never measured."""
+    signals = _signals()
+    prepared = prepare_transactions(_transactions(), signals)
+    frame = build_features(prepared, signals, families=["cross_amount"])
+
+    assert "xamt_m_kirim_karta" in frame.columns
+    assert "xamt_s_chiqim_karta" in frame.columns
+    # Frozen schema: every direction x type pair exists whether or not it occurs.
+    assert "xamt_m_chiqim_xalqaro" in frame.columns
+    assert frame.shape[1] == 8 * 3
+
+
+def test_cross_amount_is_nan_for_pairs_that_never_occur():
+    signals = _signals()
+    prepared = prepare_transactions(_transactions(), signals)
+    frame = build_features(prepared, signals, families=["cross_amount"])
+    assert pd.isna(frame.loc["SG_1", "xamt_m_kirim_naqd"])
+
+
+def test_type_quantile_family_adds_within_type_spread():
+    signals = _signals()
+    prepared = prepare_transactions(_transactions(), signals)
+    frame = build_features(prepared, signals, families=["type_quantiles"])
+    assert "tyq_q90_karta" in frame.columns
+    assert frame.shape[1] == 4 * 3

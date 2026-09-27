@@ -1,0 +1,16 @@
+{
+  "adversarial_auc": 0.49714417857142856,
+  "columns": 151,
+  "top_features": {
+    "dist_chiqim_bank_otkazmasi_skew": 801.0,
+    "dist_kirim_karta_skew": 782.0,
+    "dist_kirim_bank_otkazmasi_skew": 761.0,
+    "dist_chiqim_karta_skew": 749.0,
+    "dist_naqd_skew": 743.0,
+    "rel_chiqim_naqd_std": 697.0,
+    "rel_kirim_karta_std": 677.0,
+    "rel_kirim_std": 675.0,
+    "rel_chiqim_bank_otkazmasi_std": 666.0,
+    "dist_kirim_naqd_skew": 666.0
+  }
+}

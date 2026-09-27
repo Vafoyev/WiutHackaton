@@ -1,0 +1,37 @@
+{
+  "development_rows": 10500,
+  "audit_rows": 3500,
+  "baseline_development": {
+    "mean": 0.6356185566878877,
+    "std": 0.0022661551963641946,
+    "repeats": [
+      0.6333524014915235,
+      0.6378847118842519
+    ]
+  },
+  "candidate_development": {
+    "mean": 0.6570281950362784,
+    "std": 3.773684972779856e-05,
+    "repeats": [
+      0.6570659318860063,
+      0.6569904581865507
+    ]
+  },
+  "search_development": {
+    "mean": 0.657328081876725,
+    "std": 3.244604140439922e-05,
+    "repeats": [
+      0.6573605279181294,
+      0.6572956358353206
+    ]
+  },
+  "baseline_audit_auc": 0.633931948534666,
+  "candidate_audit_auc": 0.6304253747491102,
+  "audit_gain": -0.0035065737855557444,
+  "audit_gain_bootstrap_95pct": [
+    -0.018595997300118995,
+    0.011716473464083933
+  ],
+  "limitations": "Development CV is selection-biased. Audit excluded from this search; legacy baseline selection previously used all labels.",
+  "promoted": false
+}

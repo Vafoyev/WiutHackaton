@@ -92,6 +92,42 @@ def _cross(tx: pd.DataFrame, index: pd.Index) -> pd.DataFrame:
     return out
 
 
+def _cross_amount(tx: pd.DataFrame, index: pd.Index) -> pd.DataFrame:
+    """Amount statistics for each direction x type pair.
+
+    The columns that survive selection are amount statistics per type and per
+    direction; the cross family only ever counted transactions, so the amounts
+    on that cross were never measured.
+    """
+    key = tx["kirim_chiqim"] + "_" + tx["tranzaksiya_turi"]
+    pairs = [f"{d}_{ty}" for d in DIRECTIONS for ty in TX_TYPES]
+    out = pd.DataFrame(index=index)
+    for stat, prefix in (("mean", "m"), ("sum", "s"), ("std", "d")):
+        table = (
+            tx.assign(_pair=key)
+            .pivot_table(index="signal_id", columns="_pair",
+                         values="miqdor_indeksi", aggfunc=stat)
+            .reindex(index=index, columns=pairs)
+        )
+        for pair in pairs:
+            out[f"xamt_{prefix}_{pair}"] = table[pair]
+    return out
+
+
+def _type_quantiles(tx: pd.DataFrame, index: pd.Index) -> pd.DataFrame:
+    """Spread of amounts inside each transaction type, not just the mean."""
+    out = pd.DataFrame(index=index)
+    for q, name in ((0.25, "q25"), (0.75, "q75"), (0.9, "q90")):
+        table = (
+            tx.pivot_table(index="signal_id", columns="tranzaksiya_turi",
+                           values="miqdor_indeksi", aggfunc=lambda s, q=q: s.quantile(q))
+            .reindex(index=index, columns=list(TX_TYPES))
+        )
+        for ty in TX_TYPES:
+            out[f"tyq_{name}_{ty}"] = table[ty]
+    return out
+
+
 def _flow(tx: pd.DataFrame, index: pd.Index) -> pd.DataFrame:
     incoming = tx[tx["out"] == 0].groupby("signal_id", sort=False)["miqdor_indeksi"]
     outgoing = tx[tx["out"] == 1].groupby("signal_id", sort=False)["miqdor_indeksi"]
@@ -205,6 +241,8 @@ FEATURE_FAMILIES: dict[str, Callable] = {
     "amount_shape": lambda tx, idx, sig: _amount_shape(tx, idx),
     "direction_type": lambda tx, idx, sig: _direction_type(tx, idx),
     "cross": lambda tx, idx, sig: _cross(tx, idx),
+    "cross_amount": lambda tx, idx, sig: _cross_amount(tx, idx),
+    "type_quantiles": lambda tx, idx, sig: _type_quantiles(tx, idx),
     "flow": lambda tx, idx, sig: _flow(tx, idx),
     "windows": lambda tx, idx, sig: _windows(tx, idx),
     "burst": lambda tx, idx, sig: _burst(tx, idx),

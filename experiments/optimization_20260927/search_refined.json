@@ -1,0 +1,410 @@
+[
+  {
+    "id": "lr_refined_compact_0.0003",
+    "model": "logreg",
+    "features": "compact",
+    "params": {
+      "C": 0.0003
+    },
+    "mean": 0.6349388153076981,
+    "std": 0.000285831138816528,
+    "repeats": [
+      0.6352246464465147,
+      0.6346529841688816
+    ],
+    "seconds": 2.7104725840035826
+  },
+  {
+    "id": "lr_refined_compact_0.001",
+    "model": "logreg",
+    "features": "compact",
+    "params": {
+      "C": 0.001
+    },
+    "mean": 0.6469611254352486,
+    "std": 2.1226977971799954e-05,
+    "repeats": [
+      0.6469398984572768,
+      0.6469823524132204
+    ],
+    "seconds": 2.9779838749964256
+  },
+  {
+    "id": "lr_refined_compact_0.003",
+    "model": "logreg",
+    "features": "compact",
+    "params": {
+      "C": 0.003
+    },
+    "mean": 0.6496560910845163,
+    "std": 0.00027891484118913734,
+    "repeats": [
+      0.6493771762433271,
+      0.6499350059257054
+    ],
+    "seconds": 2.4110815419990104
+  },
+  {
+    "id": "lr_refined_compact_0.03",
+    "model": "logreg",
+    "features": "compact",
+    "params": {
+      "C": 0.03
+    },
+    "mean": 0.6482274453478624,
+    "std": 0.0006152955101307311,
+    "repeats": [
+      0.6476121498377316,
+      0.6488427408579931
+    ],
+    "seconds": 3.002658541983692
+  },
+  {
+    "id": "lightgbm_refined_compact",
+    "model": "lightgbm",
+    "features": "compact",
+    "params": {
+      "n_estimators": 500,
+      "learning_rate": 0.025,
+      "num_leaves": 3,
+      "min_child_samples": 200,
+      "reg_lambda": 30,
+      "reg_alpha": 2,
+      "colsample_bytree": 0.9,
+      "subsample": 0.9,
+      "subsample_freq": 1
+    },
+    "mean": 0.629953359931013,
+    "std": 0.0020709849266783986,
+    "repeats": [
+      0.6320243448576913,
+      0.6278823750043345
+    ],
+    "seconds": 18.00485758401919
+  },
+  {
+    "id": "catboost_refined_compact",
+    "model": "catboost",
+    "features": "compact",
+    "params": {
+      "iterations": 800,
+      "learning_rate": 0.025,
+      "depth": 3,
+      "l2_leaf_reg": 30,
+      "rsm": 0.9
+    },
+    "mean": 0.6325741108382272,
+    "std": 0.0014693148415970136,
+    "repeats": [
+      0.6311047959966303,
+      0.6340434256798243
+    ],
+    "seconds": 65.83092704199953
+  },
+  {
+    "id": "lr_refined_relative_basic_0.0003",
+    "model": "logreg",
+    "features": "relative_basic",
+    "params": {
+      "C": 0.0003
+    },
+    "mean": 0.6510412629503689,
+    "std": 5.450170019738465e-06,
+    "repeats": [
+      0.6510358127803492,
+      0.6510467131203886
+    ],
+    "seconds": 1.5997552089975215
+  },
+  {
+    "id": "lr_refined_relative_basic_0.001",
+    "model": "logreg",
+    "features": "relative_basic",
+    "params": {
+      "C": 0.001
+    },
+    "mean": 0.6528667193112719,
+    "std": 0.00016959271740002446,
+    "repeats": [
+      0.653036312028672,
+      0.6526971265938719
+    ],
+    "seconds": 1.6611189169925638
+  },
+  {
+    "id": "lr_refined_relative_basic_0.003",
+    "model": "logreg",
+    "features": "relative_basic",
+    "params": {
+      "C": 0.003
+    },
+    "mean": 0.6523551363932139,
+    "std": 0.0001948037377839662,
+    "repeats": [
+      0.6525499401309979,
+      0.6521603326554299
+    ],
+    "seconds": 1.5149864169943612
+  },
+  {
+    "id": "lr_refined_relative_basic_0.03",
+    "model": "logreg",
+    "features": "relative_basic",
+    "params": {
+      "C": 0.03
+    },
+    "mean": 0.6489746923426832,
+    "std": 0.00017682773842053745,
+    "repeats": [
+      0.6491515200811038,
+      0.6487978646042627
+    ],
+    "seconds": 1.405626541993115
+  },
+  {
+    "id": "lightgbm_refined_relative_basic",
+    "model": "lightgbm",
+    "features": "relative_basic",
+    "params": {
+      "n_estimators": 500,
+      "learning_rate": 0.025,
+      "num_leaves": 3,
+      "min_child_samples": 200,
+      "reg_lambda": 30,
+      "reg_alpha": 2,
+      "colsample_bytree": 0.9,
+      "subsample": 0.9,
+      "subsample_freq": 1
+    },
+    "mean": 0.6495817329169361,
+    "std": 0.0008812701815652524,
+    "repeats": [
+      0.6487004627353709,
+      0.6504630030985014
+    ],
+    "seconds": 10.960913457995048
+  },
+  {
+    "id": "catboost_refined_relative_basic",
+    "model": "catboost",
+    "features": "relative_basic",
+    "params": {
+      "iterations": 800,
+      "learning_rate": 0.025,
+      "depth": 3,
+      "l2_leaf_reg": 30,
+      "rsm": 0.9
+    },
+    "mean": 0.6505132498414032,
+    "std": 5.561723207314628e-06,
+    "repeats": [
+      0.6505188115646106,
+      0.6505076881181959
+    ],
+    "seconds": 32.520664832991315
+  },
+  {
+    "id": "lr_refined_location_0.0003",
+    "model": "logreg",
+    "features": "location",
+    "params": {
+      "C": 0.0003
+    },
+    "mean": 0.6095147283354786,
+    "std": 8.799952879934292e-05,
+    "repeats": [
+      0.6094267288066793,
+      0.6096027278642779
+    ],
+    "seconds": 0.7600637499999721
+  },
+  {
+    "id": "lr_refined_location_0.001",
+    "model": "logreg",
+    "features": "location",
+    "params": {
+      "C": 0.001
+    },
+    "mean": 0.6335820735684985,
+    "std": 4.959335994630942e-05,
+    "repeats": [
+      0.6335324802085521,
+      0.6336316669284447
+    ],
+    "seconds": 0.732406291004736
+  },
+  {
+    "id": "lr_refined_location_0.003",
+    "model": "logreg",
+    "features": "location",
+    "params": {
+      "C": 0.003
+    },
+    "mean": 0.6429846048951833,
+    "std": 0.00019403880164087226,
+    "repeats": [
+      0.6427905660935425,
+      0.6431786436968242
+    ],
+    "seconds": 0.7973452910082415
+  },
+  {
+    "id": "lr_refined_location_0.03",
+    "model": "logreg",
+    "features": "location",
+    "params": {
+      "C": 0.03
+    },
+    "mean": 0.6462839657145422,
+    "std": 0.0008588957993787005,
+    "repeats": [
+      0.6454250699151635,
+      0.6471428615139209
+    ],
+    "seconds": 0.7200904579949565
+  },
+  {
+    "id": "lightgbm_refined_location",
+    "model": "lightgbm",
+    "features": "location",
+    "params": {
+      "n_estimators": 500,
+      "learning_rate": 0.025,
+      "num_leaves": 3,
+      "min_child_samples": 200,
+      "reg_lambda": 30,
+      "reg_alpha": 2,
+      "colsample_bytree": 0.9,
+      "subsample": 0.9,
+      "subsample_freq": 1
+    },
+    "mean": 0.637902847245312,
+    "std": 0.0016519433457694577,
+    "repeats": [
+      0.6362509038995425,
+      0.6395547905910814
+    ],
+    "seconds": 6.385837583016837
+  },
+  {
+    "id": "catboost_refined_location",
+    "model": "catboost",
+    "features": "location",
+    "params": {
+      "iterations": 800,
+      "learning_rate": 0.025,
+      "depth": 3,
+      "l2_leaf_reg": 30,
+      "rsm": 0.9
+    },
+    "mean": 0.6370033620218385,
+    "std": 0.0019623958666930563,
+    "repeats": [
+      0.6350409661551454,
+      0.6389657578885315
+    ],
+    "seconds": 18.46970129100373
+  },
+  {
+    "id": "lr_refined_location_relative_0.0003",
+    "model": "logreg",
+    "features": "location_relative",
+    "params": {
+      "C": 0.0003
+    },
+    "mean": 0.6506376635178496,
+    "std": 7.292391231172868e-05,
+    "repeats": [
+      0.6507105874301613,
+      0.6505647396055378
+    ],
+    "seconds": 1.2917709579924121
+  },
+  {
+    "id": "lr_refined_location_relative_0.001",
+    "model": "logreg",
+    "features": "location_relative",
+    "params": {
+      "C": 0.001
+    },
+    "mean": 0.6530856185375644,
+    "std": 0.0002861817345487516,
+    "repeats": [
+      0.6533718002721132,
+      0.6527994368030157
+    ],
+    "seconds": 1.5414401250018273
+  },
+  {
+    "id": "lr_refined_location_relative_0.003",
+    "model": "logreg",
+    "features": "location_relative",
+    "params": {
+      "C": 0.003
+    },
+    "mean": 0.6525431831950668,
+    "std": 0.00038323300770853885,
+    "repeats": [
+      0.6529264162027754,
+      0.6521599501873583
+    ],
+    "seconds": 1.593263708986342
+  },
+  {
+    "id": "lr_refined_location_relative_0.03",
+    "model": "logreg",
+    "features": "location_relative",
+    "params": {
+      "C": 0.03
+    },
+    "mean": 0.6483162098128048,
+    "std": 0.00010791974085999634,
+    "repeats": [
+      0.6484241295536648,
+      0.6482082900719448
+    ],
+    "seconds": 2.021692832990084
+  },
+  {
+    "id": "lightgbm_refined_location_relative",
+    "model": "lightgbm",
+    "features": "location_relative",
+    "params": {
+      "n_estimators": 500,
+      "learning_rate": 0.025,
+      "num_leaves": 3,
+      "min_child_samples": 200,
+      "reg_lambda": 30,
+      "reg_alpha": 2,
+      "colsample_bytree": 0.9,
+      "subsample": 0.9,
+      "subsample_freq": 1
+    },
+    "mean": 0.6523514870103644,
+    "std": 7.42466143926479e-05,
+    "repeats": [
+      0.6522772403959717,
+      0.652425733624757
+    ],
+    "seconds": 9.14204162498936
+  },
+  {
+    "id": "catboost_refined_location_relative",
+    "model": "catboost",
+    "features": "location_relative",
+    "params": {
+      "iterations": 800,
+      "learning_rate": 0.025,
+      "depth": 3,
+      "l2_leaf_reg": 30,
+      "rsm": 0.9
+    },
+    "mean": 0.653328055486428,
+    "std": 0.00031424532929991145,
+    "repeats": [
+      0.6536423008157279,
+      0.6530138101571281
+    ],
+    "seconds": 42.715930917009246
+  }
+]

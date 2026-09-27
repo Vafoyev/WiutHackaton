@@ -1,0 +1,537 @@
+[
+  {
+    "id": "baseline_lightgbm",
+    "model": "lightgbm",
+    "features": "original",
+    "params": {
+      "subsample_freq": 1,
+      "n_estimators": 500,
+      "learning_rate": 0.013003520180988255,
+      "num_leaves": 8,
+      "min_child_samples": 213,
+      "subsample": 0.6504025410999158,
+      "colsample_bytree": 0.9660765134677595,
+      "reg_lambda": 9.876939614941763,
+      "reg_alpha": 0.2726872826872185
+    },
+    "mean": 0.62627374616767,
+    "std": 0.0043079291240766815,
+    "repeats": [
+      0.6219658170435932,
+      0.6305816752917466
+    ],
+    "seconds": 2.9659170410013758
+  },
+  {
+    "id": "baseline_xgboost",
+    "model": "xgboost",
+    "features": "original",
+    "params": {
+      "n_estimators": 600,
+      "learning_rate": 0.02177824141274384,
+      "max_depth": 2,
+      "min_child_weight": 34.73193825998661,
+      "subsample": 0.7400963772872062,
+      "colsample_bytree": 0.8944531554320426,
+      "reg_lambda": 9.571125864130547,
+      "reg_alpha": 0.4188409229959695
+    },
+    "mean": 0.6272498684309834,
+    "std": 0.0018894241458723426,
+    "repeats": [
+      0.6253604442851111,
+      0.6291392925768557
+    ],
+    "seconds": 1.9861628329963423
+  },
+  {
+    "id": "baseline_logreg",
+    "model": "logreg",
+    "features": "original",
+    "params": {
+      "C": 8.158109876339465
+    },
+    "mean": 0.6286835181249069,
+    "std": 0.0003505638599289873,
+    "repeats": [
+      0.6283329542649779,
+      0.6290340819848359
+    ],
+    "seconds": 0.2793872090114746
+  },
+  {
+    "id": "lgb_compact_7",
+    "model": "lightgbm",
+    "features": "compact",
+    "params": {
+      "n_estimators": 700,
+      "learning_rate": 0.025,
+      "num_leaves": 7,
+      "min_child_samples": 150,
+      "reg_lambda": 20,
+      "reg_alpha": 1,
+      "colsample_bytree": 0.85,
+      "subsample": 0.85,
+      "subsample_freq": 1
+    },
+    "mean": 0.6279123987479525,
+    "std": 4.200774319357281e-05,
+    "repeats": [
+      0.6279544064911461,
+      0.6278703910047589
+    ],
+    "seconds": 7.949762832984561
+  },
+  {
+    "id": "lgb_compact_15",
+    "model": "lightgbm",
+    "features": "compact",
+    "params": {
+      "n_estimators": 700,
+      "learning_rate": 0.025,
+      "num_leaves": 15,
+      "min_child_samples": 150,
+      "reg_lambda": 40,
+      "reg_alpha": 1,
+      "colsample_bytree": 0.85,
+      "subsample": 0.85,
+      "subsample_freq": 1
+    },
+    "mean": 0.6204268292682926,
+    "std": 0.0013645185899880397,
+    "repeats": [
+      0.6190623106783046,
+      0.6217913478582807
+    ],
+    "seconds": 19.454899458010914
+  },
+  {
+    "id": "lr_compact_0.01",
+    "model": "logreg",
+    "features": "compact",
+    "params": {
+      "C": 0.01
+    },
+    "mean": 0.6493791204560242,
+    "std": 0.0004760133874023853,
+    "repeats": [
+      0.6489031070686219,
+      0.6498551338434266
+    ],
+    "seconds": 0.9289414160011802
+  },
+  {
+    "id": "lr_compact_0.1",
+    "model": "logreg",
+    "features": "compact",
+    "params": {
+      "C": 0.1
+    },
+    "mean": 0.6464786419629689,
+    "std": 0.0007218447404011008,
+    "repeats": [
+      0.6457567972225678,
+      0.64720048670337
+    ],
+    "seconds": 1.2527239159971941
+  },
+  {
+    "id": "lr_compact_1.0",
+    "model": "logreg",
+    "features": "compact",
+    "params": {
+      "C": 1.0
+    },
+    "mean": 0.6439406475847396,
+    "std": 0.0009995803050361074,
+    "repeats": [
+      0.6429410672797035,
+      0.6449402278897757
+    ],
+    "seconds": 1.144031542004086
+  },
+  {
+    "id": "lgb_distribution_7",
+    "model": "lightgbm",
+    "features": "distribution",
+    "params": {
+      "n_estimators": 700,
+      "learning_rate": 0.025,
+      "num_leaves": 7,
+      "min_child_samples": 150,
+      "reg_lambda": 20,
+      "reg_alpha": 1,
+      "colsample_bytree": 0.85,
+      "subsample": 0.85,
+      "subsample_freq": 1
+    },
+    "mean": 0.6388106192770027,
+    "std": 0.0005907378727023627,
+    "repeats": [
+      0.6382198814043003,
+      0.639401357149705
+    ],
+    "seconds": 27.504539499990642
+  },
+  {
+    "id": "lgb_distribution_15",
+    "model": "lightgbm",
+    "features": "distribution",
+    "params": {
+      "n_estimators": 700,
+      "learning_rate": 0.025,
+      "num_leaves": 15,
+      "min_child_samples": 150,
+      "reg_lambda": 40,
+      "reg_alpha": 1,
+      "colsample_bytree": 0.85,
+      "subsample": 0.85,
+      "subsample_freq": 1
+    },
+    "mean": 0.6323519606333263,
+    "std": 0.00037682666750982197,
+    "repeats": [
+      0.6327287873008361,
+      0.6319751339658165
+    ],
+    "seconds": 54.776717458007624
+  },
+  {
+    "id": "lr_distribution_0.01",
+    "model": "logreg",
+    "features": "distribution",
+    "params": {
+      "C": 0.01
+    },
+    "mean": 0.6441243916207875,
+    "std": 0.0013785742916180843,
+    "repeats": [
+      0.6455029659124056,
+      0.6427458173291695
+    ],
+    "seconds": 7.191641334007727
+  },
+  {
+    "id": "lr_distribution_0.1",
+    "model": "logreg",
+    "features": "distribution",
+    "params": {
+      "C": 0.1
+    },
+    "mean": 0.6342127315461705,
+    "std": 0.00116502961832754,
+    "repeats": [
+      0.6353777611644981,
+      0.633047701927843
+    ],
+    "seconds": 6.181453833007254
+  },
+  {
+    "id": "lr_distribution_1.0",
+    "model": "logreg",
+    "features": "distribution",
+    "params": {
+      "C": 1.0
+    },
+    "mean": 0.6248034432835546,
+    "std": 0.0010361378782099973,
+    "repeats": [
+      0.6258395811617646,
+      0.6237673054053446
+    ],
+    "seconds": 10.659323916013818
+  },
+  {
+    "id": "lgb_original_distribution_7",
+    "model": "lightgbm",
+    "features": "original_distribution",
+    "params": {
+      "n_estimators": 700,
+      "learning_rate": 0.025,
+      "num_leaves": 7,
+      "min_child_samples": 150,
+      "reg_lambda": 20,
+      "reg_alpha": 1,
+      "colsample_bytree": 0.85,
+      "subsample": 0.85,
+      "subsample_freq": 1
+    },
+    "mean": 0.6390211679503994,
+    "std": 0.00031857996744427686,
+    "repeats": [
+      0.6393397479178438,
+      0.6387025879829552
+    ],
+    "seconds": 41.22368712499156
+  },
+  {
+    "id": "lgb_original_distribution_15",
+    "model": "lightgbm",
+    "features": "original_distribution",
+    "params": {
+      "n_estimators": 700,
+      "learning_rate": 0.025,
+      "num_leaves": 15,
+      "min_child_samples": 150,
+      "reg_lambda": 40,
+      "reg_alpha": 1,
+      "colsample_bytree": 0.85,
+      "subsample": 0.85,
+      "subsample_freq": 1
+    },
+    "mean": 0.6322010451067546,
+    "std": 0.0016533457286985187,
+    "repeats": [
+      0.630547699378056,
+      0.633854390835453
+    ],
+    "seconds": 67.61359037499642
+  },
+  {
+    "id": "lr_original_distribution_0.01",
+    "model": "logreg",
+    "features": "original_distribution",
+    "params": {
+      "C": 0.01
+    },
+    "mean": 0.6442808210620578,
+    "std": 0.0006460841898918712,
+    "repeats": [
+      0.6449269052519496,
+      0.6436347368721659
+    ],
+    "seconds": 7.215065333002713
+  },
+  {
+    "id": "lr_original_distribution_0.1",
+    "model": "logreg",
+    "features": "original_distribution",
+    "params": {
+      "C": 0.1
+    },
+    "mean": 0.6338568131332396,
+    "std": 0.00015751310080636127,
+    "repeats": [
+      0.634014326234046,
+      0.6336993000324332
+    ],
+    "seconds": 10.876743458007695
+  },
+  {
+    "id": "lr_original_distribution_1.0",
+    "model": "logreg",
+    "features": "original_distribution",
+    "params": {
+      "C": 1.0
+    },
+    "mean": 0.6244856441884231,
+    "std": 0.00031649232922037474,
+    "repeats": [
+      0.6248021365176435,
+      0.6241691518592027
+    ],
+    "seconds": 21.471318958007032
+  },
+  {
+    "id": "lgb_enhanced_7",
+    "model": "lightgbm",
+    "features": "enhanced",
+    "params": {
+      "n_estimators": 700,
+      "learning_rate": 0.025,
+      "num_leaves": 7,
+      "min_child_samples": 150,
+      "reg_lambda": 20,
+      "reg_alpha": 1,
+      "colsample_bytree": 0.85,
+      "subsample": 0.85,
+      "subsample_freq": 1
+    },
+    "mean": 0.6318594692465074,
+    "std": 0.0008759475009026407,
+    "repeats": [
+      0.63273541674741,
+      0.6309835217456047
+    ],
+    "seconds": 103.90130816597957
+  },
+  {
+    "id": "lgb_enhanced_15",
+    "model": "lightgbm",
+    "features": "enhanced",
+    "params": {
+      "n_estimators": 700,
+      "learning_rate": 0.025,
+      "num_leaves": 15,
+      "min_child_samples": 150,
+      "reg_lambda": 40,
+      "reg_alpha": 1,
+      "colsample_bytree": 0.85,
+      "subsample": 0.85,
+      "subsample_freq": 1
+    },
+    "mean": 0.6246906470747822,
+    "std": 0.0009656681360240005,
+    "repeats": [
+      0.6256563152108062,
+      0.6237249789387582
+    ],
+    "seconds": 106.50982358300826
+  },
+  {
+    "id": "lr_enhanced_0.01",
+    "model": "logreg",
+    "features": "enhanced",
+    "params": {
+      "C": 0.01
+    },
+    "mean": 0.6327887710433933,
+    "std": 0.0018099026593260126,
+    "repeats": [
+      0.6309788683840672,
+      0.6345986737027193
+    ],
+    "seconds": 8.766705665999325
+  },
+  {
+    "id": "lr_enhanced_0.1",
+    "model": "logreg",
+    "features": "enhanced",
+    "params": {
+      "C": 0.1
+    },
+    "mean": 0.6205805176883834,
+    "std": 0.0016346685378704762,
+    "repeats": [
+      0.6189458491505129,
+      0.6222151862262538
+    ],
+    "seconds": 10.942657583014807
+  },
+  {
+    "id": "lr_enhanced_1.0",
+    "model": "logreg",
+    "features": "enhanced",
+    "params": {
+      "C": 1.0
+    },
+    "mean": 0.6115005663077246,
+    "std": 0.0017240704495988801,
+    "repeats": [
+      0.6097764958581258,
+      0.6132246367573235
+    ],
+    "seconds": 32.96368179100682
+  },
+  {
+    "id": "spline_compact",
+    "model": "spline",
+    "features": "compact",
+    "params": {
+      "C": 0.1
+    },
+    "mean": 0.623052791302982,
+    "std": 0.00195919269659367,
+    "repeats": [
+      0.6210935986063884,
+      0.6250119839995757
+    ],
+    "seconds": 11.495882249990245
+  },
+  {
+    "id": "xgb_compact",
+    "model": "xgboost",
+    "features": "compact",
+    "params": {
+      "n_estimators": 900,
+      "learning_rate": 0.025,
+      "max_depth": 2,
+      "min_child_weight": 20,
+      "subsample": 0.85,
+      "colsample_bytree": 0.85,
+      "reg_lambda": 20,
+      "reg_alpha": 1
+    },
+    "mean": 0.6294318965877729,
+    "std": 0.0003371615412545159,
+    "repeats": [
+      0.6297690581290274,
+      0.6290947350465184
+    ],
+    "seconds": 16.895230624999385
+  },
+  {
+    "id": "spline_distribution",
+    "model": "spline",
+    "features": "distribution",
+    "params": {
+      "C": 0.1
+    },
+    "mean": 0.6007692452834037,
+    "std": 0.001756293384628238,
+    "repeats": [
+      0.6025255386680319,
+      0.5990129518987755
+    ],
+    "seconds": 15.895845124992775
+  },
+  {
+    "id": "xgb_distribution",
+    "model": "xgboost",
+    "features": "distribution",
+    "params": {
+      "n_estimators": 900,
+      "learning_rate": 0.025,
+      "max_depth": 2,
+      "min_child_weight": 20,
+      "subsample": 0.85,
+      "colsample_bytree": 0.85,
+      "reg_lambda": 20,
+      "reg_alpha": 1
+    },
+    "mean": 0.6427049729263601,
+    "std": 0.0007924260357745627,
+    "repeats": [
+      0.6434973989621346,
+      0.6419125468905855
+    ],
+    "seconds": 25.60266808400047
+  },
+  {
+    "id": "spline_original_distribution",
+    "model": "spline",
+    "features": "original_distribution",
+    "params": {
+      "C": 0.1
+    },
+    "mean": 0.5988283154372274,
+    "std": 0.0030925412096598492,
+    "repeats": [
+      0.6019208566468872,
+      0.5957357742275675
+    ],
+    "seconds": 17.098166165989824
+  },
+  {
+    "id": "xgb_original_distribution",
+    "model": "xgboost",
+    "features": "original_distribution",
+    "params": {
+      "n_estimators": 900,
+      "learning_rate": 0.025,
+      "max_depth": 2,
+      "min_child_weight": 20,
+      "subsample": 0.85,
+      "colsample_bytree": 0.85,
+      "reg_lambda": 20,
+      "reg_alpha": 1
+    },
+    "mean": 0.6435952629799464,
+    "std": 0.0022114463259607087,
+    "repeats": [
+      0.6458067093059071,
+      0.6413838166539857
+    ],
+    "seconds": 27.57725320899044
+  }
+]
