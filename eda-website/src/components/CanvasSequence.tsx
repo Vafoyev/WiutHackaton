@@ -81,9 +81,10 @@ export const CanvasSequence: React.FC<CanvasSequenceProps> = ({ frameCount, text
       }
     });
 
-    // Animate the frames
+    // Animate the frames over a timeline duration equal to the total frames
     tl.to(airpods, {
       frame: frameCount - 1,
+      duration: frameCount - 1,
       snap: 'frame',
       ease: 'none',
       onUpdate: render,
