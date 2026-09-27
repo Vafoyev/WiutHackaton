@@ -1,6 +1,35 @@
-import React, { useContext, useEffect, useRef } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import { LanguageContext, translations } from '../locales/translations';
-import { data } from '../data/mockData';
+import { data } from '../data/edaData';
+
+const TOKENS: Record<string, string> = {
+  alerts: data.alerts,
+  transactions: data.transactions,
+  rate: data.rate,
+  columns: data.columns,
+  auc: data.auc,
+  aucStd: data.auc_std,
+  adv: data.adversarial,
+  drift: data.drift_verdict,
+  kept: data.family_level_kept.join(' + '),
+  familiesMeasured: String(data.families_measured),
+  familiesUsed: String(data.families_used),
+  rejected: String(data.rejected_families),
+  chance: String(data.chance_families),
+  nullMean: data.null_mean,
+  holdoutAuc: data.holdout_auc,
+  holdoutCv: data.holdout_cv,
+  holdoutRows: data.holdout_rows,
+  optimism: data.holdout_optimism,
+  gain: data.ensemble_gain,
+  bestSingle: data.best_single_model,
+  bestSingleAuc: data.best_single_auc,
+};
+
+/** Replace every {token} from the generated data; leave unknown ones visible. */
+function fill(template: string): string {
+  return template.replace(/\{(\w+)\}/g, (match, key) => TOKENS[key] ?? match);
+}
 
 export function EdaSection() {
   const lang = useContext(LanguageContext);
@@ -464,7 +493,7 @@ export function EdaSection() {
             <div className="md:col-span-6 p-4 sm:p-6 flex flex-col justify-center">
               <h2 className="text-white text-lg font-medium mb-4 leading-snug">{t.targetDistTitle}</h2>
               <p className="text-slate-400 text-sm leading-relaxed mb-4">
-                {t.targetDistDesc.replace("{rate}", data.rate)}
+                {fill(t.targetDistDesc)}
               </p>
             </div>
           </article>
@@ -484,7 +513,7 @@ export function EdaSection() {
           <aside className="w-full max-w-[850px] bg-[#0e161c]/80 backdrop-blur-md border border-[#4ade80]/90 rounded-xl px-5 py-3 shadow-[0_0_15px_rgba(74,222,128,0.15)] flex items-start gap-3.5">
             <span aria-hidden="true" className="text-[#4ade80] text-2xl font-serif font-black leading-none mt-0.5 select-none">“</span>
             <p className="text-[13.5px] leading-[1.4] text-slate-200 font-normal">
-              {t.ablationDesc.replace('{rejected}', data.rejected_families.toString()).replace('{chance}', data.chance_families.toString()).replace('{drift}', data.drift_verdict).replace('{adv}', data.adversarial.toString())}
+              {fill(t.ablationDesc)}
             </p>
           </aside>
         </header>
@@ -533,9 +562,9 @@ export function EdaSection() {
           </h2>
           <div className="space-y-4 text-slate-300 text-[15px] leading-relaxed">
             <p>
-              {t.conclusion1} 
+              {fill(t.conclusion1)} 
             </p>
-            <p>{t.conclusion2}</p>
+            <p>{fill(t.conclusion2)}</p>
           </div>
         </div>
       </section>

@@ -1,0 +1,61 @@
+{
+  "observed": 0.6156705297196888,
+  "null_scores": [
+    0.5197971381671252,
+    0.5318488326120927,
+    0.5135297761688448,
+    0.5195316731797974,
+    0.5070525595751987
+  ],
+  "holdout": {
+    "cv_mean": 0.6187996945597205,
+    "cv_std": 0.003547426007922056,
+    "holdout_auc": 0.6213804609664894,
+    "optimism": -0.002580766406768853,
+    "n_train": 11200,
+    "n_holdout": 2800,
+    "columns": [
+      "ty_m_bank_otkazmasi",
+      "base_min",
+      "ty_m_naqd",
+      "amt_skew",
+      "ty_s_naqd",
+      "base_max",
+      "win_max60",
+      "win_max90",
+      "amt_q90",
+      "win_out14",
+      "win_out120",
+      "ty_s_bank_otkazmasi",
+      "win_n60",
+      "base_std",
+      "ty_m_karta",
+      "burst_gap_q90",
+      "hour_mean",
+      "flow_net",
+      "amt_q10",
+      "win_out3",
+      "amt_q75",
+      "win_recency",
+      "cross_sh_chiqim_xalqaro",
+      "cross_sh_chiqim_naqd",
+      "cross_sh_kirim_bank_otkazmasi",
+      "ty_sh_naqd",
+      "amt_q99",
+      "cross_sh_kirim_naqd",
+      "sig_week",
+      "cross_n_kirim_karta"
+    ],
+    "params": {
+      "subsample_freq": 1,
+      "n_estimators": 900,
+      "learning_rate": 0.04073131629912128,
+      "num_leaves": 4,
+      "min_child_samples": 209,
+      "subsample": 0.6438686000624448,
+      "colsample_bytree": 0.41763428890455573,
+      "reg_lambda": 6.2340049746740105,
+      "reg_alpha": 0.16214253022487526
+    }
+  }
+}

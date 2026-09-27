@@ -3,10 +3,17 @@ __pycache__/
 *.py[cod]
 .ipynb_checkpoints/
 .DS_Store
-
-# Competition data — never commit (162MB, organizer-supplied)
-
-
-# Generated artifacts (the submission CSV itself IS committed)
-
 .pytest_cache/
+node_modules/
+
+# Competition data — organizer-supplied, must not be added to the repo.
+# NOTE: fintech_data/ was already committed in 379cce7 ("data add") and is
+# therefore still tracked; this pattern only stops NEW data files. To remove it
+# from the working tree on the remote: git rm -r --cached fintech_data
+fintech_data/
+*.parquet
+
+# Local build/scratch artifacts
+docs-static/
+screenshot*.png
+temp_usta_ai2/

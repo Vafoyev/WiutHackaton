@@ -18,6 +18,11 @@ from src.site_data import compute
 
 PALETTE = {"Dismissed": "#4a8f79", "Escalated": "#d36a52"}
 
+# docs/ belongs to the Vite build of the React EDA site (eda-website/). Writing
+# there would destroy the published site, so this standalone fallback page has
+# its own directory.
+DEFAULT_OUTPUT = config.ROOT / "docs-static"
+
 
 def _figure_to_data_uri(fig) -> str:
     buffer = io.BytesIO()
@@ -92,7 +97,7 @@ def _charts(tables: dict[str, pd.DataFrame]) -> dict[str, str]:
 
 
 def build(output_dir: Path | None = None) -> Path:
-    output_dir = config.DOCS if output_dir is None else output_dir
+    output_dir = DEFAULT_OUTPUT if output_dir is None else output_dir
     signals = load_signals(config.TRAIN_SIGNALS)
     tx = prepare_transactions(load_transactions(config.TRAIN_TX), signals)
     tables = compute(signals, tx)

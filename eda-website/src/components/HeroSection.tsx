@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import { LanguageContext, translations } from '../locales/translations';
 
 export function HeroSection() {
