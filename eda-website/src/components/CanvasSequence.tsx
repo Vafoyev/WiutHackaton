@@ -41,7 +41,8 @@ export const CanvasSequence: React.FC<CanvasSequenceProps> = ({ frameCount, getF
       if (!canvas || !ctx) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      const img = images[airpods.frame];
+      const frameIndex = Math.round(airpods.frame);
+      const img = images[frameIndex];
       if (img && img.complete) {
         // Draw image covering the whole canvas (object-fit: cover equivalent)
         const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
