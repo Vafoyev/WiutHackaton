@@ -60,7 +60,20 @@ const translations = {
     rejected: "rejected",
     total: "Total",
     escalated: "Escalated",
-    dismissed: "Dismissed"
+    dismissed: "Dismissed",
+    amlTitle: "Приоритизация AML-алертов",
+    day30: "День -30",
+    day20: "День -20",
+    day10: "День -10",
+    day5: "День -5",
+    alertDate: "Дата алерта",
+    kirim: "Кирим",
+    chiqim: "Чиким",
+    karta: "Карта",
+    bankOtk: "Банк Отказмаси",
+    naqdXalq: "Накд / Халкаро",
+    targetPlaceholder: "ГРАФ: РАСПРЕДЕЛЕНИЕ ТАРГЕТА",
+    footerEvent: "WIUT Хакатон 2026 · FinTech / ИИ в Финансах"
   },
   en: {
         seq1: "Millions of raw transactions form an ocean of noise.",
@@ -114,7 +127,20 @@ const translations = {
     rejected: "rejected",
     total: "Total",
     escalated: "Escalated",
-    dismissed: "Dismissed"
+    dismissed: "Dismissed",
+    amlTitle: "AML Alert Prioritization",
+    day30: "Day -30",
+    day20: "Day -20",
+    day10: "Day -10",
+    day5: "Day -5",
+    alertDate: "Alert Date",
+    kirim: "Kirim",
+    chiqim: "Chiqim",
+    karta: "Karta",
+    bankOtk: "Bank Otkazmasi",
+    naqdXalq: "Naqd / Xalqaro",
+    targetPlaceholder: "GRAPH: TARGET DISTRIBUTION",
+    footerEvent: "WIUT Hackathon 2026 · FinTech / AI in Finance"
   },
   uz: {
         seq1: "Millionlab xom tranzaksiyalar shovqin ummonini hosil qiladi.",
@@ -168,7 +194,20 @@ const translations = {
     rejected: "rejected",
     total: "Total",
     escalated: "Escalated",
-    dismissed: "Dismissed"
+    dismissed: "Dismissed",
+    amlTitle: "AML Signallarini Ustuvorlashtirish",
+    day30: "Kun -30",
+    day20: "Kun -20",
+    day10: "Kun -10",
+    day5: "Kun -5",
+    alertDate: "Signal sanasi",
+    kirim: "Kirim",
+    chiqim: "Chiqim",
+    karta: "Karta",
+    bankOtk: "Bank Otkazmasi",
+    naqdXalq: "Naqd / Xalqaro",
+    targetPlaceholder: "GRAFIK: TARGET TAQSIMOTI",
+    footerEvent: "WIUT Hackathon 2026 · FinTech / Moliyada Sun'iy Intellekt"
   }
 };
 
@@ -573,7 +612,7 @@ function EdaSection() {
       <div className="absolute left-1/3 top-1/3 w-[360px] h-[360px] bg-cyan-500/10 rounded-full blur-[100px] pointer-events-none z-0"></div>
 
       <main className="relative z-10 w-full max-w-[1360px] bg-[#050b12] rounded-2xl overflow-hidden border border-cyan-950/40 shadow-2xl flex flex-col p-6 sm:p-10 mb-8 mt-4">
-        <h2 className="text-3xl md:text-5xl font-normal tracking-wide text-white drop-shadow-md text-center mb-8">AML Alert Prioritization</h2>
+        <h2 className="text-3xl md:text-5xl font-normal tracking-wide text-white drop-shadow-md text-center mb-8">{t.amlTitle}</h2>
         <section className="relative z-10 w-full flex-1 flex flex-wrap items-center justify-around px-2 py-8 my-auto">
           <svg className="absolute inset-0 w-full h-full pointer-events-none z-0 hidden lg:block" xmlns="http://www.w3.org/2000/svg">
             <defs>
@@ -710,11 +749,11 @@ function EdaSection() {
                     <text textAnchor="end" x="40" y="159">400</text>
                     <text textAnchor="end" x="40" y="204">200</text>
                     <text textAnchor="end" x="40" y="222">0</text>
-                    <text fill="#64748b" fontSize="9" textAnchor="middle" x="45" y="235">Day -30</text>
-                    <text textAnchor="middle" x="135" y="235">Day -20</text>
-                    <text textAnchor="middle" x="230" y="235">Day -10</text>
-                    <text textAnchor="middle" x="325" y="235">Day -5</text>
-                    <text textAnchor="middle" x="410" y="235">Alert Date</text>
+                    <text fill="#64748b" fontSize="9" textAnchor="middle" x="45" y="235">{t.day30}</text>
+                    <text textAnchor="middle" x="135" y="235">{t.day20}</text>
+                    <text textAnchor="middle" x="230" y="235">{t.day10}</text>
+                    <text textAnchor="middle" x="325" y="235">{t.day5}</text>
+                    <text textAnchor="middle" x="410" y="235">{t.alertDate}</text>
                     <text fill="#cbd5e1" fontSize="11" textAnchor="middle" x="235" y="255">{t.daysToAlert}</text>
                     <text fill="#cbd5e1" fontSize="11" textAnchor="middle" transform="rotate(-90)" x="-110" y="12">{t.transactions}</text>
                   </g>
@@ -904,11 +943,11 @@ function EdaSection() {
                     <text x="403" y="69">{t.dismissed}</text>
                   </g>
                   <g fill="#94a3b8" fontFamily="sans-serif" fontSize="9">
-                    <text transform="rotate(30, 65, 215)" x="65" y="215">Kirim</text>
-                    <text transform="rotate(30, 127, 215)" x="127" y="215">Chiqim</text>
-                    <text transform="rotate(30, 190, 215)" x="190" y="215">Karta</text>
-                    <text transform="rotate(30, 252, 215)" x="252" y="215">Bank Otkazmasi</text>
-                    <text transform="rotate(30, 306, 215)" x="306" y="215">Naqd / Xalqaro</text>
+                    <text transform="rotate(30, 65, 215)" x="65" y="215">{t.kirim}</text>
+                    <text transform="rotate(30, 127, 215)" x="127" y="215">{t.chiqim}</text>
+                    <text transform="rotate(30, 190, 215)" x="190" y="215">{t.karta}</text>
+                    <text transform="rotate(30, 252, 215)" x="252" y="215">{t.bankOtk}</text>
+                    <text transform="rotate(30, 306, 215)" x="306" y="215">{t.naqdXalq}</text>
                   </g>
                 </svg>
               </div>
@@ -926,7 +965,7 @@ function EdaSection() {
           <article className="grid grid-cols-1 md:grid-cols-12 gap-5 items-stretch lg:col-span-2" data-purpose="chart-card-group">
             <div className="md:col-span-6 flex flex-col justify-end">
               <div className="relative w-full aspect-[2/1] sm:aspect-[16/9] rounded-xl border border-dashed border-cyan-500/20 bg-cyan-900/10 flex items-center justify-center">
-                 <span className="text-cyan-500/40 font-mono text-sm">GRAPH: TARGET DISTRIBUTION</span>
+                 <span className="text-cyan-500/40 font-mono text-sm">{t.targetPlaceholder}</span>
               </div>
             </div>
             <div className="md:col-span-6 glass-card rounded-2xl p-6 sm:p-7 flex flex-col justify-center">
@@ -1016,7 +1055,7 @@ function EdaSection() {
           </div>
         </div>
         <p className="text-slate-600 text-xs mt-2 font-mono">
-          WIUT Hackathon 2026 · FinTech / AI in Finance
+          {t.footerEvent}
         </p>
       </footer>
 
