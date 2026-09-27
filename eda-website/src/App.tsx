@@ -4,6 +4,10 @@ import './index.css';
 
 const translations = {
   ru: {
+        seq1: "Миллионы сырых транзакций формируют океан шума.",
+    seq2: "Внезапный всплеск активности за 30 дней выдает аномалию.",
+    seq3: "Ablation-фильтр сжигает лишние признаки (Noise Reduction).",
+    seq4: "Идеальный сигнал найден: эскалация точна на 99%.",
     heroTitle1: "Океан шума.",
     heroTitle2: "Идеальный сигнал.",
     heroDesc: "Мы построили систему приоритизации AML-алертов, основанную на строгой математике, доказательном отборе признаков и защите от переобучения.",
@@ -54,6 +58,10 @@ const translations = {
     dismissed: "Dismissed"
   },
   en: {
+        seq1: "Millions of raw transactions form an ocean of noise.",
+    seq2: "A sudden burst of activity in 30 days reveals an anomaly.",
+    seq3: "Ablation filter burns away redundant features (Noise Reduction).",
+    seq4: "Perfect signal isolated: 99% precise escalation.",
     heroTitle1: "An Ocean of Noise.",
     heroTitle2: "The Perfect Signal.",
     heroDesc: "We built an AML alert prioritization system based on rigorous mathematics, evidence-based feature selection, and overfitting protection.",
@@ -104,6 +112,10 @@ const translations = {
     dismissed: "Dismissed"
   },
   uz: {
+        seq1: "Millionlab xom tranzaksiyalar shovqin ummonini hosil qiladi.",
+    seq2: "30 kun ichidagi to'satdan faollik anomaliyani oshkor qiladi.",
+    seq3: "Ablation filtri ortiqcha belgilarni yo'q qiladi (Noise Reduction).",
+    seq4: "Mukammal signal topildi: eskalyatsiya 99% aniq.",
     heroTitle1: "Shovqin ummoni.",
     heroTitle2: "Mukammal signal.",
     heroDesc: "Biz qat'iy matematika, isbotlangan belgilar tanlovi va haddan tashqari moslashishdan himoyalanishga asoslangan AML signallarini ustuvorlashtirish tizimini qurdik.",
