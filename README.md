@@ -71,16 +71,24 @@ Each alert carries a fixed 180-day transaction history. We summarize it into
 alert-level features, then **select among them by measurement rather than by
 intuition**.
 
-Nine feature families were built and offered to a greedy forward search judged on
-repeated cross-validation. The search kept two; permutation-importance elimination
-then cut the survivors further — and cutting columns *raised* accuracy. The exact
-trace is the 24-row ablation table in `experiments/summary.json`, reproduced on the
-site and in the notebook.
+Eleven feature families are built and offered to selection. A greedy search at
+*family* level keeps only two (direction_type + base); selecting
+individual **columns** across all families beats that, because a weak family can
+still contain a strong column. The shipped model uses **25 columns**.
 
-Most families did not earn their place. Several scored at or below chance on their
-own and were rejected. The columns that survived are almost entirely per-direction
-and per-type **amount** statistics: raw transaction counts carried very little, and
-the signal sits in how amounts are distributed across direction and type.
+| Stage | Columns | CV ROC-AUC |
+| --- | ---: | ---: |
+| best single model (lightgbm) | 25 | 0.63260 |
+| four-model rank-average ensemble | 25 | **0.63757** ± 0.00086 |
+| ensemble gain over best single | | +0.00497 |
+
+Three independent checks, because a cross-validated number is not self-validating:
+
+| Check | Result | Reading |
+| --- | ---: | --- |
+| Permutation test (fixed columns) | null mean 0.5184 | no leakage |
+| Untouched 20% holdout (2,800 alerts) | 0.62138 vs 0.61880 CV | optimism -0.00258 |
+| Adversarial validation | 0.4956 | train and test indistinguishable |
 
 The acceptance rule throughout is **`mean − std` across CV repeats**, not `mean`.
 Two equally good feature sets measured 0.6053 and 0.6136 in early probing; that
@@ -101,6 +109,17 @@ alerts using the same features the model uses. It reaches **ROC-AUC 0.4921** —
 two sets are indistinguishable. That matters: it means the cross-validated figure
 describes the population the model is actually asked to score, rather than a
 different one.
+
+### Measured after the submission was frozen
+
+Two further families — amount statistics on the direction x type cross
+(`cross_amount`) and within-type quantiles (`type_quantiles`) — are implemented
+and measured: 16 of their columns enter the global top 40 and cross-validation
+rises to 0.6454. An untouched holdout moves only 0.6195 -> 0.6223, so most of
+that CV gain is the selection step overfitting a wider feature space. They are
+in `src/features.py` and covered by tests, but the submitted model does not use
+them: it is reproduced from the recorded families and columns in
+`experiments/`, which predate them.
 
 ### How to read our numbers
 
@@ -138,7 +157,7 @@ src/
   pipeline.py     end-to-end run
   site_data.py    small aggregates for the website
   build_site.py   static HTML renderer
-experiments/      log.csv (88 runs), summary.json, selected_features.json
+experiments/      log.csv (343 runs), summary.json, selected_features.json, integrity.json
 docs/             the published EDA site, plus spec and plan
 ```
 

@@ -3,7 +3,7 @@ import { createContext } from 'react';
 export const translations = {
   ru: {
     seq1: "{transactions} транзакций. {alerts} алертов. Океан шума.",
-    seq2: "Девять семейств признаков измерены повторной кросс-валидацией.",
+    seq2: "{familiesMeasured} семейств признаков измерены повторной кросс-валидацией.",
     seq3: "{rejected} семейства отвергнуты. Осталось {columns} признаков.",
     seq4: "ROC-AUC {auc}. Проверено на выборке, которую модель не видела: {holdoutAuc}.",
     heroTitle1: "Океан шума.",
@@ -69,7 +69,7 @@ export const translations = {
   },
   en: {
     seq1: "{transactions} transactions. {alerts} alerts. An ocean of noise.",
-    seq2: "Nine feature families measured by repeated cross-validation.",
+    seq2: "{familiesMeasured} feature families measured by repeated cross-validation.",
     seq3: "{rejected} families rejected. {columns} features survive.",
     seq4: "ROC-AUC {auc}. Checked on data the model never saw: {holdoutAuc}.",
     heroTitle1: "An Ocean of Noise.",
@@ -135,7 +135,7 @@ export const translations = {
   },
   uz: {
     seq1: "{transactions} tranzaksiya. {alerts} signal. Shovqin ummoni.",
-    seq2: "To'qqizta belgi oilasi takroriy kesishma-tekshirish bilan o'lchandi.",
+    seq2: "{familiesMeasured} ta belgi oilasi takroriy kesishma-tekshirish bilan o'lchandi.",
     seq3: "{rejected} oila rad etildi. {columns} ta belgi qoldi.",
     seq4: "ROC-AUC {auc}. Model ko'rmagan namunada tekshirildi: {holdoutAuc}.",
     heroTitle1: "Shovqin ummoni.",
