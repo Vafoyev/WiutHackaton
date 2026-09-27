@@ -17,6 +17,11 @@ node_modules/
 fintech_data/
 *.parquet
 
+# Only one submission file may exist in outputs/: the task allows a single
+# official submission, and a second CSV beside it is a mis-send waiting to
+# happen. Candidates that were measured and rejected live under experiments/.
+outputs/*_optimized.csv
+
 # Scratch output
 docs-static/
 # 76MB of OOF arrays and feature parquets from an exploratory optimization run.
