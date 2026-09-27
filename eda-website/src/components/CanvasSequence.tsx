@@ -128,20 +128,44 @@ export const CanvasSequence: React.FC<CanvasSequenceProps> = ({ frameCount, text
   }, [frameCount, getFrameUrl, texts]);
 
   return (
-    <div ref={containerRef} className="relative w-full h-screen bg-[#030708] overflow-hidden flex items-center justify-center">
-      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full object-cover" />
+    <div ref={containerRef} className="relative w-full h-screen bg-[#030708] overflow-hidden">
+      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full object-cover opacity-80" />
       
-      {texts.map((text, i) => (
-        <div 
-          key={i}
-          ref={el => { textRefs.current[i] = el; }}
-          className="absolute z-10 p-6 md:p-8 max-w-2xl bg-black/40 backdrop-blur-md rounded-2xl border border-[#22f396]/30 shadow-[0_0_40px_rgba(34,243,150,0.1)] text-center transform translate-y-10 opacity-0"
-        >
-          <h2 className="text-xl md:text-3xl font-hud tracking-wide text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] glow-text">
-            {text}
-          </h2>
+      {/* Cinematic Topline */}
+      <div className="absolute top-0 left-0 w-full p-6 md:p-10 flex justify-between items-start z-20 pointer-events-none mix-blend-difference text-white/70 text-[10px] md:text-xs font-mono uppercase tracking-[0.2em]">
+        <div className="w-8 border-t border-white/30 mt-2"></div>
+        <div>AML INTELLIGENCE / CORE ENGINE</div>
+      </div>
+
+      {/* Text Sequences */}
+      <div className="absolute inset-0 z-10 pointer-events-none">
+        {texts.map((text, i) => (
+          <div 
+            key={i}
+            ref={el => { textRefs.current[i] = el; }}
+            className="absolute bottom-24 left-6 md:left-16 max-w-3xl transform translate-y-10 opacity-0"
+          >
+            <p className="text-[10px] md:text-xs font-mono uppercase tracking-[0.3em] text-[#22f396] mb-4 flex items-center gap-3">
+              <span className="w-6 border-t border-[#22f396]"></span>
+              STEP 0{i + 1} // ANALYSIS
+            </p>
+            <h2 className="text-3xl md:text-5xl lg:text-6xl font-light tracking-tight text-white leading-[1.1] drop-shadow-2xl">
+              {text}
+            </h2>
+          </div>
+        ))}
+      </div>
+
+      {/* Cinematic Bottomline */}
+      <div className="absolute bottom-0 left-0 w-full p-6 md:p-10 flex justify-between items-end z-20 pointer-events-none mix-blend-difference text-white/50 text-[10px] md:text-xs font-mono uppercase tracking-[0.2em]">
+        <div>SIGNAL PROCESSOR</div>
+        <div className="flex items-center gap-2 text-[#22f396]">
+          SCROLL TO EXPLORE <span className="animate-bounce">↓</span>
         </div>
-      ))}
+      </div>
+      
+      {/* Subtle vignette/gradient overlay for better text readability */}
+      <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-t from-[#030708]/80 via-transparent to-transparent" />
     </div>
   );
 };
