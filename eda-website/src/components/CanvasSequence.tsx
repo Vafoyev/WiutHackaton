@@ -19,9 +19,24 @@ export const CanvasSequence: React.FC<CanvasSequenceProps> = ({ frameCount, getF
     const ctx = canvas?.getContext('2d');
     if (!canvas || !ctx) return;
 
-    // Optional: Make it responsive to window size (4K default)
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    const resizeCanvas = () => {
+      if (!canvas || !ctx) return;
+      const dpr = window.devicePixelRatio || 1;
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      
+      // Ensure CSS size remains the same
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
+      
+      // Normalize coordinate system to use css pixels
+      ctx.scale(dpr, dpr);
+    };
+
+    resizeCanvas();
 
     const images: HTMLImageElement[] = [];
     const airpods = { frame: 0 };
@@ -39,23 +54,26 @@ export const CanvasSequence: React.FC<CanvasSequenceProps> = ({ frameCount, getF
 
     function render() {
       if (!canvas || !ctx) return;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // We scaled the context, so we clear using the logical width/height
+      const logicalWidth = canvas.width / (window.devicePixelRatio || 1);
+      const logicalHeight = canvas.height / (window.devicePixelRatio || 1);
+      ctx.clearRect(0, 0, logicalWidth, logicalHeight);
       
       const frameIndex = Math.round(airpods.frame);
       const img = images[frameIndex];
       if (img && img.complete) {
         // Draw image covering the whole canvas (object-fit: cover equivalent)
-        const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
-        const x = (canvas.width / 2) - (img.width / 2) * scale;
-        const y = (canvas.height / 2) - (img.height / 2) * scale;
+        const scale = Math.max(logicalWidth / img.width, logicalHeight / img.height);
+        const x = (logicalWidth / 2) - (img.width / 2) * scale;
+        const y = (logicalHeight / 2) - (img.height / 2) * scale;
         ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
       }
     }
 
     // Resize handler
     const handleResize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      resizeCanvas();
       render();
     };
     window.addEventListener('resize', handleResize);
