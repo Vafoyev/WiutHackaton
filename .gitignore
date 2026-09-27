@@ -5,10 +5,8 @@ __pycache__/
 .DS_Store
 
 # Competition data — never commit (162MB, organizer-supplied)
-fintech_data/
+
 
 # Generated artifacts (the submission CSV itself IS committed)
-experiments/*.pkl
-*.parquet
-!site_data/*.parquet
+
 .pytest_cache/
