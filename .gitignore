@@ -1,24 +1,25 @@
+# Python
 .venv/
 __pycache__/
 *.py[cod]
 .ipynb_checkpoints/
-.DS_Store
 .pytest_cache/
+
+# Node
 node_modules/
 
-# Competition data — organizer-supplied, must not be added to the repo.
-# NOTE: fintech_data/ was already committed in 379cce7 ("data add") and is
-# therefore still tracked; this pattern only stops NEW data files. To remove it
-# from the working tree on the remote: git rm -r --cached fintech_data
+# macOS
+.DS_Store
+
+# Competition data — organizer-supplied, must not be republished.
+# It was committed in 379cce7 and untracked again later; the copies in git
+# history remain until someone rewrites it.
 fintech_data/
 *.parquet
 
-# Local build/scratch artifacts
+# Scratch output
 docs-static/
-screenshot*.png
-temp_usta_ai2/
-
-# Rebuildable optimization caches and row-level validation predictions.
-experiments/optimization_*/oof_*.npy
-experiments/optimization_*/audit_predictions.csv
-experiments/nested_*/repeat_*_fold_*.npz
+# 76MB of OOF arrays and feature parquets from an exploratory optimization run.
+# Its conclusion is recorded in the README; the artifacts themselves are scratch.
+experiments/optimization_*/
+tools/screenshot*.png
