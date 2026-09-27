@@ -27,6 +27,8 @@ FAMILY_PREFIXES = {
     "base_": "base",
     "amt_": "amount_shape",
     "cross_": "cross",
+    "xamt_": "cross_amount",
+    "tyq_": "type_quantiles",
     "flow_": "flow",
     "win_": "windows",
     "burst_": "burst",

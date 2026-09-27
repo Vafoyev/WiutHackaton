@@ -237,3 +237,23 @@ def test_type_mix_gap_matches_the_series_it_summarises():
         abs(row["dismissed"] - row["escalated"]) for row in charts["typesByOutcome"]
     )
     assert abs(charts["facts"]["typeMixMaxGap"] - expected) < 1e-9
+
+
+def test_every_feature_family_has_a_prefix_mapping():
+    """A family whose prefix is missing here is silently uncounted on the site,
+    so families_used under-reports what the model actually draws on."""
+    from src.features import FEATURE_FAMILIES
+    from src.web_data import FAMILY_PREFIXES
+
+    mapped = set(FAMILY_PREFIXES.values())
+    assert set(FEATURE_FAMILIES) - mapped == set(), set(FEATURE_FAMILIES) - mapped
+
+
+def test_new_amount_cross_columns_map_to_their_families():
+    from src.web_data import family_of
+
+    assert family_of("xamt_m_kirim_naqd") == "cross_amount"
+    assert family_of("xamt_d_chiqim_karta") == "cross_amount"
+    assert family_of("tyq_q90_bank_otkazmasi") == "type_quantiles"
+    # The shorter "ty_" prefix must not swallow "tyq_".
+    assert family_of("ty_m_naqd") == "direction_type"
