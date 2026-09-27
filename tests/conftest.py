@@ -7,6 +7,8 @@ submission CSV, which must never land in the real outputs/ directory.
 """
 import pytest
 
+from src import config
+
 import src.selection as selection
 import src.submission as submission
 import src.validation as validation
@@ -21,3 +23,16 @@ def _redirect_experiment_artifacts(tmp_path_factory):
     # writes a synthetic team_2ABB3C78.csv into the real outputs/ directory.
     submission.OUTPUTS = scratch / "outputs"
     yield
+
+
+@pytest.fixture
+def requires_competition_data():
+    """Skip when fintech_data/ is absent.
+
+    The organizer's dataset is not in the repository, so tests that read it
+    cannot run in CI. Skipping is right here: the test still guards the
+    behaviour for anyone who has the data, and CI keeps covering everything
+    that runs on fixtures.
+    """
+    if not config.TRAIN_SIGNALS.exists():
+        pytest.skip(f"competition data not present ({config.TRAIN_SIGNALS})")

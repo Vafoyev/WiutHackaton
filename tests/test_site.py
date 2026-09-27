@@ -70,7 +70,7 @@ def test_build_site_cannot_overwrite_the_react_build_output():
     assert build_site.DEFAULT_OUTPUT != config.ROOT
 
 
-def test_build_site_writes_where_it_says(tmp_path):
+def test_build_site_writes_where_it_says(tmp_path, requires_competition_data):
     from src.build_site import build
 
     target = build(tmp_path / "somewhere")
