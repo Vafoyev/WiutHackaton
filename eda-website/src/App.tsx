@@ -926,7 +926,7 @@ function EdaSection() {
         </header>
 
         <div className="relative z-10 w-full flex justify-center pb-2 mt-8">
-          <div className="w-full max-w-[725px] bg-[#0c1219]/75 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
+          <div className="w-full bg-[#0c1219]/75 backdrop-blur-xl border border-white/10 rounded-2xl p-4 sm:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
             <table className="w-full text-left text-sm border-collapse">
               <thead>
                 <tr className="table-row-border text-slate-300 font-medium text-[13px]">
