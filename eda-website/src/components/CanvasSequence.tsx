@@ -129,7 +129,7 @@ export const CanvasSequence: React.FC<CanvasSequenceProps> = ({ frameCount, text
   }, [frameCount, getFrameUrl, texts]);
 
   return (
-    <div ref={containerRef} className="relative w-full h-screen bg-[#030708] overflow-hidden">
+    <div ref={containerRef} className="relative w-full h-screen bg-[#030708] overflow-hidden z-20">
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full object-cover opacity-80" />
       
       {/* Cinematic Topline */}
