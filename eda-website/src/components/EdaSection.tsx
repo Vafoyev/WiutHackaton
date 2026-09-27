@@ -3,6 +3,7 @@ import { LanguageContext, translations } from '../locales/translations';
 import { data } from '../data/edaData';
 import {
   fill,
+  yTicks,
   PLOT,
   plotY,
   linePath,
@@ -252,12 +253,11 @@ export function EdaSection() {
                     <line x1="45" x2="440" y1="200" y2="200"></line>
                   </g>
                   <g fill="#94a3b8" fontFamily="sans-serif" fontSize="10">
-                    <text textAnchor="end" x="40" y="24">1000</text>
-                    <text textAnchor="end" x="40" y="69">800</text>
-                    <text textAnchor="end" x="40" y="114">600</text>
-                    <text textAnchor="end" x="40" y="159">400</text>
-                    <text textAnchor="end" x="40" y="204">200</text>
-                    <text textAnchor="end" x="40" y="222">0</text>
+                    {yTicks(daysMax, (v) => (v * 100).toFixed(1) + '%').map((tick) => (
+                      <text key={tick.label} textAnchor="end" x="40" y={tick.y + 3}>
+                        {tick.label}
+                      </text>
+                    ))}
                     <text fill="#64748b" fontSize="9" textAnchor="middle" x="48" y="235">180</text>
                     <text fill="#64748b" fontSize="9" textAnchor="middle" x="146" y="235">135</text>
                     <text fill="#64748b" fontSize="9" textAnchor="middle" x="243" y="235">90</text>
@@ -317,13 +317,11 @@ export function EdaSection() {
                     <line x1="45" x2="440" y1="200" y2="200"></line>
                   </g>
                   <g fill="#94a3b8" fontFamily="sans-serif" fontSize="10">
-                    <text textAnchor="end" x="40" y="24">60M</text>
-                    <text textAnchor="end" x="40" y="60">50M</text>
-                    <text textAnchor="end" x="40" y="96">40M</text>
-                    <text textAnchor="end" x="40" y="132">30M</text>
-                    <text textAnchor="end" x="40" y="168">20M</text>
-                    <text textAnchor="end" x="40" y="204">10M</text>
-                    <text textAnchor="end" x="40" y="218">0</text>
+                    {yTicks(typesMax, compact).map((tick) => (
+                      <text key={tick.label} textAnchor="end" x="40" y={tick.y + 3}>
+                        {tick.label}
+                      </text>
+                    ))}
                     <text fill="#cbd5e1" fontSize="11" textAnchor="middle" transform="rotate(-90)" x="-110" y="10">{t.transactions}</text>
                     <text fill="#cbd5e1" fontSize="11" textAnchor="middle" x="250" y="255">{t.transactions}</text>
                   </g>
@@ -384,11 +382,11 @@ export function EdaSection() {
                     <line x1="45" x2="440" y1="215" y2="215"></line>
                   </g>
                   <g fill="#94a3b8" fontFamily="sans-serif" fontSize="10">
-                    <text textAnchor="end" x="40" y="44">200</text>
-                    <text textAnchor="end" x="40" y="89">150</text>
-                    <text textAnchor="end" x="40" y="134">100</text>
-                    <text textAnchor="end" x="40" y="179">50</text>
-                    <text textAnchor="end" x="40" y="218">0</text>
+                    {yTicks(weeklyMax, compact).map((tick) => (
+                      <text key={tick.label} textAnchor="end" x="40" y={tick.y + 3}>
+                        {tick.label}
+                      </text>
+                    ))}
                     <text textAnchor="middle" x="135" y="235">2010</text>
                     <text textAnchor="middle" x="210" y="235">2015</text>
                     <text textAnchor="middle" x="280" y="235">2020</text>
@@ -432,12 +430,11 @@ export function EdaSection() {
                     <line x1="45" x2="380" y1="200" y2="200"></line>
                   </g>
                   <g fill="#94a3b8" fontFamily="sans-serif" fontSize="10">
-                    <text textAnchor="end" x="40" y="24">1</text>
-                    <text textAnchor="end" x="40" y="60">0.8</text>
-                    <text textAnchor="end" x="40" y="96">0.6</text>
-                    <text textAnchor="end" x="40" y="132">0.4</text>
-                    <text textAnchor="end" x="40" y="168">0.2</text>
-                    <text textAnchor="end" x="40" y="204">0</text>
+                    {yTicks(outcomeMax, (v) => (v * 100).toFixed(0) + '%').map((tick) => (
+                      <text key={tick.label} textAnchor="end" x="40" y={tick.y + 3}>
+                        {tick.label}
+                      </text>
+                    ))}
                     <text fill="#cbd5e1" fontSize="11" textAnchor="middle" transform="rotate(-90)" x="-110" y="10">{t.transactionTypes}</text>
                   </g>
                   
@@ -458,12 +455,10 @@ export function EdaSection() {
                   })}
 
                   <g fill="#94a3b8" fontFamily="sans-serif" fontSize="9">
-                    <rect fill="#00f2fe" height="7" width="7" x="390" y="32"></rect>
-                    <text x="403" y="39">{t.total}</text>
-                    <rect fill="#22c55e" height="7" width="7" x="390" y="47"></rect>
-                    <text x="403" y="54">{t.escalated}</text>
-                    <rect fill="#a3e635" height="7" width="7" x="390" y="62"></rect>
-                    <text x="403" y="69">{t.dismissed}</text>
+                    <rect fill="#00f2fe" height="7" width="7" x="366" y="32"></rect>
+                    <text x="379" y="39">{t.dismissed}</text>
+                    <rect fill="#d36a52" height="7" width="7" x="366" y="47"></rect>
+                    <text x="379" y="54">{t.escalated}</text>
                   </g>
                   <g fill="#94a3b8" fontFamily="sans-serif" fontSize="9">
                     <text transform="rotate(30, 65, 215)" x="65" y="215">{t.kirim}</text>

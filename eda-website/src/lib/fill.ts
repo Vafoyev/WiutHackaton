@@ -89,8 +89,17 @@ function fill(template: string): string {
   return template.replace(/\{(\w+)\}/g, (match, key) => TOKENS[key] ?? match);
 }
 
+/** Five evenly spaced ticks from 0 to max, positioned on the plot scale. */
+function yTicks(max: number, format: (v: number) => string) {
+  return [1, 0.75, 0.5, 0.25, 0].map((f) => ({
+    y: PLOT.yBase - f * (PLOT.yBase - PLOT.yTop),
+    label: format(max * f),
+  }));
+}
+
 export {
   fill,
+  yTicks,
   TOKENS,
   PLOT,
   plotX,
