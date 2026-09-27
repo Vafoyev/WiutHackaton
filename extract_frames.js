@@ -21,10 +21,9 @@ console.log('Extracting frames to WEBP in 4K resolution... This may take a momen
 
 ffmpeg(inputVideo)
   .outputOptions([
-    '-vf', 'scale=3840:-1', // Upscale to 4K width (preserve aspect ratio)
     '-vcodec', 'libwebp',
     '-lossless', '0',
-    '-qscale', '60', // Good quality
+    '-qscale', '85', // Better quality
     '-preset', 'default',
     '-r', '24' // 24 FPS to save space
   ])

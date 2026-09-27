@@ -38,13 +38,20 @@ body {
 .animate-pulse-glow { animation: pulse-subtle 4s ease-in-out infinite; }
 
 .glass-card { 
-  background: linear-gradient(145deg, rgba(19, 26, 43, 0.85) 0%, rgba(13, 18, 30, 0.85) 100%); 
+  background: linear-gradient(145deg, rgba(10, 15, 25, 0.3) 0%, rgba(5, 8, 15, 0.5) 100%); 
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px); 
-  border: 1px solid rgba(255, 255, 255, 0.08); 
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5); 
+  border: 1px solid rgba(0, 242, 254, 0.08); 
+  box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08); 
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
+.glass-card:hover {
+  background: linear-gradient(145deg, rgba(15, 22, 35, 0.65) 0%, rgba(8, 12, 22, 0.85) 100%); 
+  border: 1px solid rgba(34, 243, 150, 0.25);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.8), 0 0 25px rgba(34, 243, 150, 0.1), inset 0 1px 0 rgba(34, 243, 150, 0.2);
+  transform: translateY(-6px) scale(1.01);
+}
 .prism-background { 
   position: absolute; width: 540px; height: 520px; left: 50%; top: 55%; 
   transform: translate(-50%, -46%) rotate(12deg); 

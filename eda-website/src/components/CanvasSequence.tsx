@@ -13,6 +13,7 @@ interface CanvasSequenceProps {
 export const CanvasSequence: React.FC<CanvasSequenceProps> = ({ frameCount, texts = [], getFrameUrl }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const pinWrapperRef = useRef<HTMLDivElement>(null);
   const textRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
@@ -73,11 +74,10 @@ export const CanvasSequence: React.FC<CanvasSequenceProps> = ({ frameCount, text
 
     const tl = gsap.timeline({
       scrollTrigger: {
-        trigger: containerRef.current,
+        trigger: pinWrapperRef.current,
         start: 'top top',
-        end: '+=800%',
+        end: 'bottom bottom',
         scrub: 2,
-        pin: true,
       }
     });
 
@@ -129,14 +129,15 @@ export const CanvasSequence: React.FC<CanvasSequenceProps> = ({ frameCount, text
   }, [frameCount, getFrameUrl, texts]);
 
   return (
-    <div ref={containerRef} className="relative w-full h-screen bg-[#030708] overflow-hidden z-20">
-      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full object-cover opacity-80" />
-      
-      {/* Cinematic Topline */}
-      <div className="absolute top-0 left-0 w-full p-6 md:p-10 flex justify-between items-start z-20 pointer-events-none mix-blend-difference text-white/70 text-[10px] md:text-xs font-mono uppercase tracking-[0.2em]">
-        <div className="w-8 border-t border-white/30 mt-2"></div>
-        <div>AML INTELLIGENCE / CORE ENGINE</div>
-      </div>
+    <div ref={pinWrapperRef} className="w-full relative" style={{ height: '900vh' }}>
+      <div ref={containerRef} className="sticky top-0 w-full h-screen bg-[#030708] overflow-hidden">
+        <canvas ref={canvasRef} className="absolute inset-0 w-full h-full object-cover opacity-80" />
+        
+        {/* Cinematic Topline */}
+        <div className="absolute top-0 left-0 w-full p-6 md:p-10 flex justify-between items-start z-20 pointer-events-none mix-blend-difference text-white/70 text-[10px] md:text-xs font-mono uppercase tracking-[0.2em]">
+          <div className="w-8 border-t border-white/30 mt-2"></div>
+          <div>AML INTELLIGENCE / CORE ENGINE</div>
+        </div>
 
       {/* Text Sequences */}
       <div className="absolute inset-0 z-10 pointer-events-none">
@@ -167,6 +168,7 @@ export const CanvasSequence: React.FC<CanvasSequenceProps> = ({ frameCount, text
       
       {/* Subtle vignette/gradient overlay for better text readability */}
       <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-t from-[#030708]/80 via-transparent to-transparent" />
+    </div>
     </div>
   );
 };
