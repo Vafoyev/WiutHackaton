@@ -227,6 +227,54 @@ def chart_series(signals, tx) -> dict:
     }
 
 
+def dataset_facts(
+    *,
+    train_alerts: int,
+    train_tx: int,
+    test_alerts: int,
+    test_tx: int,
+    per_alert_median: int,
+    per_alert_min: int,
+    per_alert_max: int,
+    window_days: int,
+) -> dict:
+    """The files, their columns, and the one-to-many relation between them.
+
+    The task asks for "an overview of the dataset and its structure" and points
+    out that the transaction table is relational. The page showed row counts but
+    never named a file, a column, or the relation.
+    """
+    return {
+        "files": [
+            {"name": "train_signals.csv", "rows": f"{train_alerts:,}", "cols": 3,
+             "what": "one row per training alert"},
+            {"name": "train_transactions.parquet", "rows": f"{train_tx:,}", "cols": 5,
+             "what": "transaction history behind those alerts"},
+            {"name": "test_signals.csv", "rows": f"{test_alerts:,}", "cols": 2,
+             "what": "one row per scored alert, no target"},
+            {"name": "test_transactions.parquet", "rows": f"{test_tx:,}", "cols": 5,
+             "what": "transaction history behind those"},
+        ],
+        "signalColumns": [
+            {"name": "signal_id", "type": "id", "what": "unique alert identifier"},
+            {"name": "signal_sanasi", "type": "date", "what": "date the alert was raised"},
+            {"name": "eskalatsiya", "type": "target", "what": "1 = escalated, 0 = dismissed"},
+        ],
+        "txColumns": [
+            {"name": "signal_id", "type": "id", "what": "the alert this transaction belongs to"},
+            {"name": "tranzaksiya_vaqti", "type": "timestamp", "what": "when it happened"},
+            {"name": "kirim_chiqim", "type": "category", "what": "direction: kirim / chiqim"},
+            {"name": "tranzaksiya_turi", "type": "category",
+             "what": "type: karta / bank_otkazmasi / naqd / xalqaro"},
+            {"name": "miqdor_indeksi", "type": "number", "what": "standardized transaction size"},
+        ],
+        "perAlertMedian": f"{per_alert_median:,}",
+        "perAlertMin": f"{per_alert_min:,}",
+        "perAlertMax": f"{per_alert_max:,}",
+        "windowDays": window_days,
+    }
+
+
 def render_typescript(payload: dict) -> str:
     body = json.dumps(payload, indent=2, ensure_ascii=False)
     return (
@@ -250,6 +298,20 @@ def main() -> None:
         positive_rate=float(signals[config.TARGET].mean()),
     )
     payload["charts"] = chart_series(signals, tx)
+
+    test_signals = load_signals(config.TEST_SIGNALS)
+    test_tx_frame = load_transactions(config.TEST_TX)
+    per_alert = tx.groupby("signal_id").size()
+    payload["dataset"] = dataset_facts(
+        train_alerts=len(signals),
+        train_tx=len(load_transactions(config.TRAIN_TX)),
+        test_alerts=len(test_signals),
+        test_tx=len(test_tx_frame),
+        per_alert_median=int(per_alert.median()),
+        per_alert_min=int(per_alert.min()),
+        per_alert_max=int(per_alert.max()),
+        window_days=int(round(tx["days_before"].max())),
+    )
     TARGET_FILE.parent.mkdir(parents=True, exist_ok=True)
     TARGET_FILE.write_text(render_typescript(payload), encoding="utf-8")
     print(f"wrote {TARGET_FILE}")

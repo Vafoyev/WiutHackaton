@@ -257,3 +257,39 @@ def test_new_amount_cross_columns_map_to_their_families():
     assert family_of("tyq_q90_bank_otkazmasi") == "type_quantiles"
     # The shorter "ty_" prefix must not swallow "tyq_".
     assert family_of("ty_m_naqd") == "direction_type"
+
+
+def test_dataset_block_describes_the_files_and_the_relation():
+    """The task asks for an overview of the dataset and its structure, and
+    stresses that the transaction table is relational. The site showed row
+    counts but never named a file, a column, or the one-to-many relation."""
+    from src.web_data import dataset_facts
+
+    facts = dataset_facts(
+        train_alerts=14000, train_tx=6987663, test_alerts=6000, test_tx=3027575,
+        per_alert_median=461, per_alert_min=1, per_alert_max=2279, window_days=180,
+    )
+    names = [f["name"] for f in facts["files"]]
+    assert "train_signals.csv" in names
+    assert "train_transactions.parquet" in names
+    assert facts["perAlertMedian"] == "461"
+    assert facts["windowDays"] == 180
+    signal_cols = [c["name"] for c in facts["signalColumns"]]
+    tx_cols = [c["name"] for c in facts["txColumns"]]
+    assert signal_cols == ["signal_id", "signal_sanasi", "eskalatsiya"]
+    assert tx_cols == [
+        "signal_id", "tranzaksiya_vaqti", "kirim_chiqim",
+        "tranzaksiya_turi", "miqdor_indeksi",
+    ]
+
+
+def test_dataset_row_counts_are_formatted_for_display():
+    from src.web_data import dataset_facts
+
+    facts = dataset_facts(
+        train_alerts=14000, train_tx=6987663, test_alerts=6000, test_tx=3027575,
+        per_alert_median=461, per_alert_min=1, per_alert_max=2279, window_days=180,
+    )
+    rows = {f["name"]: f["rows"] for f in facts["files"]}
+    assert rows["train_transactions.parquet"] == "6,987,663"
+    assert rows["test_signals.csv"] == "6,000"

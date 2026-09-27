@@ -1004,5 +1004,81 @@ export const data = {
         "median": 493.0
       }
     ]
+  },
+  "dataset": {
+    "files": [
+      {
+        "name": "train_signals.csv",
+        "rows": "14,000",
+        "cols": 3,
+        "what": "one row per training alert"
+      },
+      {
+        "name": "train_transactions.parquet",
+        "rows": "6,987,663",
+        "cols": 5,
+        "what": "transaction history behind those alerts"
+      },
+      {
+        "name": "test_signals.csv",
+        "rows": "6,000",
+        "cols": 2,
+        "what": "one row per scored alert, no target"
+      },
+      {
+        "name": "test_transactions.parquet",
+        "rows": "3,027,575",
+        "cols": 5,
+        "what": "transaction history behind those"
+      }
+    ],
+    "signalColumns": [
+      {
+        "name": "signal_id",
+        "type": "id",
+        "what": "unique alert identifier"
+      },
+      {
+        "name": "signal_sanasi",
+        "type": "date",
+        "what": "date the alert was raised"
+      },
+      {
+        "name": "eskalatsiya",
+        "type": "target",
+        "what": "1 = escalated, 0 = dismissed"
+      }
+    ],
+    "txColumns": [
+      {
+        "name": "signal_id",
+        "type": "id",
+        "what": "the alert this transaction belongs to"
+      },
+      {
+        "name": "tranzaksiya_vaqti",
+        "type": "timestamp",
+        "what": "when it happened"
+      },
+      {
+        "name": "kirim_chiqim",
+        "type": "category",
+        "what": "direction: kirim / chiqim"
+      },
+      {
+        "name": "tranzaksiya_turi",
+        "type": "category",
+        "what": "type: karta / bank_otkazmasi / naqd / xalqaro"
+      },
+      {
+        "name": "miqdor_indeksi",
+        "type": "number",
+        "what": "standardized transaction size"
+      }
+    ],
+    "perAlertMedian": "461",
+    "perAlertMin": "1",
+    "perAlertMax": "2,279",
+    "windowDays": 180
   }
 };

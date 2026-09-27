@@ -35,6 +35,10 @@ const TOKENS: Record<string, string> = {
   typeMixGap: (charts.facts.typeMixMaxGap * 100).toFixed(2),
   topType: charts.facts.topType,
   topTypeShare: (charts.facts.topTypeShare * 100).toFixed(1) + '%',
+  perAlertMedian: data.dataset.perAlertMedian,
+  perAlertMin: data.dataset.perAlertMin,
+  perAlertMax: data.dataset.perAlertMax,
+  windowDays: String(data.dataset.windowDays),
 };
 
 /* ---------------------------------------------------------------------------

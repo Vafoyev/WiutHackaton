@@ -221,6 +221,61 @@ export function EdaSection() {
         </div>
       </main>
 
+      {/* ==========================================
+             DATASET AND ITS STRUCTURE
+          ========================================== */}
+      <section className="relative z-10 w-full max-w-[1100px] px-4 mb-20">
+        <h2 className="text-2xl md:text-4xl font-light tracking-wide text-white mb-5">{t.datasetTitle}</h2>
+        <p className="text-slate-400 text-sm md:text-base leading-relaxed mb-3 max-w-[860px]">{fill(t.datasetIntro)}</p>
+        <p className="text-slate-400 text-sm md:text-base leading-relaxed mb-8 max-w-[860px]">{fill(t.datasetRelation)}</p>
+
+        <h3 className="text-[#6ee7b7] font-mono text-xs uppercase tracking-widest mb-3">{t.datasetFiles}</h3>
+        <div className="overflow-x-auto mb-10">
+          <table className="w-full text-left text-[13px] border-collapse">
+            <thead className="text-slate-500 font-mono text-[11px] uppercase">
+              <tr>
+                <th className="pb-2 pr-4 font-semibold" scope="col">{t.colName}</th>
+                <th className="pb-2 pr-4 font-semibold text-right" scope="col">{t.fileRows}</th>
+                <th className="pb-2 pr-4 font-semibold text-right" scope="col">{t.fileCols}</th>
+                <th className="pb-2 font-semibold" scope="col">{t.fileWhat}</th>
+              </tr>
+            </thead>
+            <tbody className="text-slate-300">
+              {data.dataset.files.map((f) => (
+                <tr className="border-t border-cyan-900/30" key={f.name}>
+                  <td className="py-2 pr-4 font-mono text-[#6ee7b7] whitespace-nowrap">{f.name}</td>
+                  <td className="py-2 pr-4 text-right font-mono">{f.rows}</td>
+                  <td className="py-2 pr-4 text-right font-mono">{f.cols}</td>
+                  <td className="py-2 text-slate-400">{f.what}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {[
+            { title: t.datasetSignalCols, cols: data.dataset.signalColumns },
+            { title: t.datasetTxCols, cols: data.dataset.txColumns },
+          ].map((group) => (
+            <div key={group.title}>
+              <h3 className="text-[#6ee7b7] font-mono text-xs uppercase tracking-widest mb-3">{group.title}</h3>
+              <table className="w-full text-left text-[13px] border-collapse">
+                <tbody className="text-slate-300">
+                  {group.cols.map((c) => (
+                    <tr className="border-t border-cyan-900/30" key={c.name}>
+                      <td className="py-2 pr-3 font-mono text-cyan-300 align-top whitespace-nowrap">{c.name}</td>
+                      <td className="py-2 text-slate-400">{c.what}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ))}
+        </div>
+      </section>
+
+
       {/* --- ALL 5 ARTICLES FROM YOUR ORIGINAL DESIGN --- */}
       <section className="relative z-10 w-full max-w-[1400px] flex flex-col items-center px-4">
         <header className="w-full text-center mb-10 md:mb-16">
