@@ -1,3 +1,4 @@
+import { CanvasSequence } from './components/CanvasSequence';
 import { useEffect, useRef, useState, createContext, useContext } from 'react';
 import './index.css';
 
@@ -449,6 +450,12 @@ function HeroSection() {
         
         <p className="max-w-2xl text-sm sm:text-base md:text-[17px] text-[#788e9f] leading-relaxed font-normal">{t.heroDesc}</p>
       </main>
+      
+            {/* --- SCROLL-BOUND VIDEO SEQUENCE --- */}
+      <CanvasSequence 
+        frameCount={240} 
+        getFrameUrl={(index: number) => `/video-frames/frame_${index}.webp`} 
+      />
       
       <footer className="relative z-10 w-full flex justify-center items-center pb-2">
         <a aria-label={t.scrollDown} className="text-[#526b7c] hover:text-[#22f396] transition-colors duration-300 p-2" href="#details">
